@@ -1,0 +1,829 @@
+Build a world-class viral startup hiring platform called FoundrMatch — a highly addictive, mobile-first matchmaking app that connects ambitious talent with startups/founders through swiping, AI matching, personality compatibility, and instant networking.
+This should feel like Tinder + LinkedIn + AngelList + TikTok + YC Network.
+Do NOT make this feel like a boring job board. It must feel aspirational, exciting, modern, and emotionally charged.
+Core emotion users should feel:
+“One swipe could change my life.”
+
+TECH STACK (Production Ready)
+Use:
+
+
+Next.js 15 (App Router)
+
+
+React
+
+
+TypeScript
+
+
+Tailwind CSS
+
+
+ShadCN UI
+
+
+Supabase (Postgres, Auth, Storage, Realtime)
+
+
+Prisma ORM
+
+
+Stripe subscriptions
+
+
+OpenAI API
+
+
+Framer Motion animations
+
+
+React Query
+
+
+Zustand state management
+
+
+Resend for email
+
+
+Daily.co or Stream for video calls
+
+
+Deployable on Replit
+
+
+
+USER TYPES
+1. Talent Users
+People seeking startup jobs, missions, cofounders, or career upgrades.
+Collect rich profile data:
+
+
+Full name
+
+
+Headshot
+
+
+Resume upload
+
+
+Skills tags
+
+
+Years experience
+
+
+Past companies
+
+
+Desired roles
+
+
+Salary expectations
+
+
+Equity expectations
+
+
+Preferred industries
+
+
+Remote / hybrid / in-person
+
+
+City
+
+
+Portfolio links
+
+
+LinkedIn
+
+
+Why startups?
+
+
+Availability date
+
+
+Work style
+
+
+Personality type
+
+
+Dream companies
+
+
+Willingness to relocate
+
+
+Visa status (optional)
+
+
+
+2. Founder / Startup Users
+Collect:
+
+
+Founder name
+
+
+Company name
+
+
+Logo
+
+
+Mission
+
+
+Elevator pitch
+
+
+Industry
+
+
+Stage (idea / pre-seed / seed / growth)
+
+
+Funding raised
+
+
+Investors
+
+
+Team size
+
+
+Open roles
+
+
+Salary bands
+
+
+Equity offered
+
+
+Location
+
+
+Remote options
+
+
+Culture style
+
+
+Why join now?
+
+
+Growth metrics
+
+
+Founder intro selfie video
+
+
+Website
+
+
+Social links
+
+
+
+CORE EXPERIENCE
+SWIPE MATCHING SYSTEM
+Talent sees startup cards:
+
+
+Company logo
+
+
+Mission
+
+
+Funding stage
+
+
+Team size
+
+
+Founder intro video
+
+
+Role openings
+
+
+Equity potential
+
+
+AI fit %
+
+
+Growth momentum meter
+
+
+“People like you joined here”
+
+
+Swipe:
+
+
+Left = Pass
+
+
+Right = Interested
+
+
+Up = Super Apply
+
+
+Down = Save for later
+
+
+Founders see talent cards:
+
+
+Name
+
+
+Resume snapshot
+
+
+Skills
+
+
+Experience
+
+
+AI fit score
+
+
+Salary ask
+
+
+Portfolio
+
+
+Personality match
+
+
+Availability
+
+
+“Likely to interview”
+
+
+Swipe same way.
+
+MUTUAL MATCH MAGIC
+If both swipe yes:
+Trigger cinematic match animation:
+“Future unlocked.”
+Then instantly unlock:
+
+
+Real-time chat
+
+
+Resume share
+
+
+One-click intro call
+
+
+Calendar booking
+
+
+Voice note exchange
+
+
+Founder can request interview
+
+
+Talent can request office tour/demo
+
+
+
+INSANELY USEFUL FEATURES
+1. AI MATCH ENGINE
+Use OpenAI to deeply score compatibility based on:
+
+
+Skills overlap
+
+
+Career trajectory
+
+
+Startup stage fit
+
+
+Personality compatibility
+
+
+Salary/equity alignment
+
+
+Mission resonance
+
+
+Work style match
+
+
+Output:
+
+
+Match %
+
+
+Why you match
+
+
+Red flags
+
+
+Suggested talking points
+
+
+Example:
+“You are 94% aligned. Founder values speed and ownership. You thrive in autonomy.”
+
+2. STARTUP HEAT SCORE
+Every startup gets live desirability score based on:
+
+
+User saves
+
+
+Swipe rate
+
+
+Growth signals
+
+
+Founder responsiveness
+
+
+Funding recency
+
+
+Team reviews
+
+
+Creates urgency and virality.
+
+3. TALENT MOMENTUM SCORE
+Measures candidate demand:
+
+
+Likes received
+
+
+Founder replies
+
+
+Skill demand
+
+
+Profile strength
+
+
+Response speed
+
+
+Makes users improve profiles.
+
+4. FOUNDER VERIFICATION BADGE
+Manual + domain verification.
+Badges:
+
+
+Verified Founder
+
+
+Funded Startup
+
+
+YC Alumni
+
+
+Women-led
+
+
+Fast Growing
+
+
+Remote Friendly
+
+
+
+5. TIKTOK-STYLE FOUNDER FEED
+Scrollable vertical videos:
+“Why join us now.”
+Founders pitch company in 30 sec.
+Talent can:
+
+
+Like
+
+
+Apply
+
+
+Save
+
+
+Share
+
+
+DM
+
+
+Huge viral mechanic.
+
+6. EQUITY CALCULATOR
+Interactive calculator:
+“If you take 0.5% at $5M valuation and company exits at $500M…”
+Show possible future payout.
+Make startup offers feel exciting.
+
+7. COFOUNDER MODE
+Optional toggle for users seeking cofounders.
+Filters:
+
+
+Technical founder
+
+
+Growth founder
+
+
+Product founder
+
+
+Operator founder
+
+
+This alone could become massive.
+
+8. PERSONALITY / WORKSTYLE MATCH
+Quick onboarding quiz.
+Outputs:
+
+
+Builder
+
+
+Visionary
+
+
+Operator
+
+
+Craftsman
+
+
+Rainmaker
+
+
+Use in matching.
+
+9. INTERVIEW AUTO PREP
+Once matched:
+AI generates:
+
+
+Likely interview questions
+
+
+Founder background
+
+
+Company talking points
+
+
+Smart questions to ask
+
+
+
+10. SECRET MARKET MODE
+Top startups can privately recruit anonymously.
+Top talent can browse stealth roles.
+Very attractive feature.
+
+VIRAL GROWTH LOOPS
+Referral Engine
+Invite 3 friends unlock premium.
+Invite founders = front-of-line visibility.
+Shareable Cards
+Generate social cards:
+“Matched with a funded AI startup.”
+Success Stories Feed
+Show users:
+
+
+“Designer matched in 2 days”
+
+
+“Engineer got 3 offers this week”
+
+
+Creates FOMO.
+
+MONETIZATION
+Talent Free
+
+
+Limited swipes
+
+
+Basic matches
+
+
+Limited chats
+
+
+Talent Pro ($19/mo)
+
+
+Unlimited swipes
+
+
+See who liked you
+
+
+AI profile optimization
+
+
+Priority ranking
+
+
+Salary insights
+
+
+Hidden mode
+
+
+Startup Starter ($99/mo)
+
+
+50 swipes/day
+
+
+Basic chat
+
+
+3 jobs
+
+
+Startup Growth ($299/mo)
+
+
+Unlimited candidates
+
+
+AI recruiting assistant
+
+
+Featured placement
+
+
+Analytics
+
+
+Startup Scale ($599/mo)
+
+
+Team seats
+
+
+Bulk outreach
+
+
+Pipeline CRM
+
+
+Branded page
+
+
+Recruiter Enterprise
+Custom $1k+/mo
+
+ADMIN PANEL
+Need full admin dashboard:
+
+
+Users
+
+
+Reports
+
+
+Bans
+
+
+Revenue
+
+
+Match analytics
+
+
+City growth
+
+
+Funnel metrics
+
+
+Badge approvals
+
+
+Featured startups
+
+
+Waitlist management
+
+
+
+PAGES TO BUILD
+
+
+Landing page
+
+
+Waitlist page
+
+
+Auth
+
+
+Onboarding flow
+
+
+Swipe deck
+
+
+Matches
+
+
+Chat
+
+
+Founder dashboard
+
+
+Talent dashboard
+
+
+Video feed
+
+
+Premium billing
+
+
+Settings
+
+
+Admin panel
+
+
+
+DESIGN DIRECTION
+Make it elite.
+Think:
+
+
+Apple polish
+
+
+Tinder addictiveness
+
+
+Linear minimalism
+
+
+Notion cleanliness
+
+
+YC ambition
+
+
+Use:
+
+
+Dark mode
+
+
+Smooth animations
+
+
+Glassmorphism
+
+
+Gradient glows
+
+
+Microinteractions
+
+
+Fast loading
+
+
+Mobile-first
+
+
+
+DATABASE TABLES
+Users
+Profiles
+TalentProfiles
+StartupProfiles
+Swipes
+Matches
+Messages
+Subscriptions
+Videos
+Roles
+AnalyticsEvents
+Referrals
+Badges
+Notifications
+
+MVP PHASE PLAN
+Phase 1
+
+
+Auth
+
+
+Profiles
+
+
+Swipe deck
+
+
+Match logic
+
+
+Chat
+
+
+Stripe
+
+
+AI fit score
+
+
+Phase 2
+
+
+Video pitches
+
+
+Equity calculator
+
+
+Personality quiz
+
+
+Founder verification
+
+
+Phase 3
+
+
+Cofounder mode
+
+
+Referral loops
+
+
+Growth dashboards
+
+
+Enterprise tools
+
+
+
+IMPORTANT UX RULE
+Every screen should make users feel:
+
+
+Opportunity
+
+
+Momentum
+
+
+Exclusivity
+
+
+Future success
+
+
+
+FINAL GOAL
+Build something so strong that users stop using LinkedIn for startups.
+Make this polished enough to attract real Austin startups first, then scale nationally.
+Start by generating complete production-ready codebase with schema, auth, onboarding, swipe logic, matching, chat, payments, and premium subscriptions.

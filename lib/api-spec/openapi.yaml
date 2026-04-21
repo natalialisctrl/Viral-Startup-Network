@@ -3,20 +3,44 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: FoundrMatch API — viral startup hiring platform
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: users
+    description: User management
+  - name: talent
+    description: Talent profile operations
+  - name: startups
+    description: Startup profile operations
+  - name: swipes
+    description: Swipe / matching operations
+  - name: matches
+    description: Match management
+  - name: messages
+    description: Real-time messaging
+  - name: videos
+    description: Founder video feed
+  - name: roles
+    description: Open roles at startups
+  - name: notifications
+    description: User notifications
+  - name: subscriptions
+    description: Stripe subscriptions
+  - name: analytics
+    description: Platform analytics / admin
+  - name: ai
+    description: AI-powered features
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +48,1322 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # ── USERS ────────────────────────────────────────────────────────────────────
+  /users:
+    get:
+      operationId: listUsers
+      tags: [users]
+      summary: List users (admin)
+      parameters:
+        - name: limit
+          in: query
+          schema: { type: integer, default: 50 }
+        - name: offset
+          in: query
+          schema: { type: integer, default: 0 }
+        - name: search
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserList"
+
+  /users/{id}:
+    get:
+      operationId: getUser
+      tags: [users]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateUser
+      tags: [users]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserBody"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/me:
+    get:
+      operationId: getMe
+      tags: [users]
+      summary: Get current user (session-based)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthenticated
+
+  /users/register:
+    post:
+      operationId: registerUser
+      tags: [users]
+      summary: Register a new user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterUserBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "409":
+          description: Email already taken
+
+  /users/login:
+    post:
+      operationId: loginUser
+      tags: [users]
+      summary: Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginUserBody"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Invalid credentials
+
+  /users/logout:
+    post:
+      operationId: logoutUser
+      tags: [users]
+      summary: Logout
+      responses:
+        "204":
+          description: No content
+
+  # ── TALENT PROFILES ──────────────────────────────────────────────────────────
+  /talent:
+    get:
+      operationId: listTalent
+      tags: [talent]
+      summary: List talent profiles for swipe deck
+      parameters:
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: offset
+          in: query
+          schema: { type: integer, default: 0 }
+        - name: skills
+          in: query
+          schema: { type: string }
+        - name: role
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TalentProfileList"
+
+  /talent/{id}:
+    get:
+      operationId: getTalentProfile
+      tags: [talent]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TalentProfile"
+        "404":
+          description: Not found
+
+  /talent/me:
+    get:
+      operationId: getMyTalentProfile
+      tags: [talent]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TalentProfile"
+    post:
+      operationId: createTalentProfile
+      tags: [talent]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTalentProfileBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TalentProfile"
+    patch:
+      operationId: updateTalentProfile
+      tags: [talent]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTalentProfileBody"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TalentProfile"
+
+  # ── STARTUP PROFILES ─────────────────────────────────────────────────────────
+  /startups:
+    get:
+      operationId: listStartups
+      tags: [startups]
+      summary: List startup profiles for swipe deck
+      parameters:
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: offset
+          in: query
+          schema: { type: integer, default: 0 }
+        - name: stage
+          in: query
+          schema: { type: string }
+        - name: industry
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StartupProfileList"
+
+  /startups/{id}:
+    get:
+      operationId: getStartupProfile
+      tags: [startups]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StartupProfile"
+        "404":
+          description: Not found
+
+  /startups/me:
+    get:
+      operationId: getMyStartupProfile
+      tags: [startups]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StartupProfile"
+    post:
+      operationId: createStartupProfile
+      tags: [startups]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStartupProfileBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StartupProfile"
+    patch:
+      operationId: updateStartupProfile
+      tags: [startups]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateStartupProfileBody"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StartupProfile"
+
+  # ── HOT STARTUPS (wow endpoint) ───────────────────────────────────────────────
+  /startups/hot:
+    get:
+      operationId: getHotStartups
+      tags: [startups]
+      summary: Trending startups by heat score
+      parameters:
+        - name: limit
+          in: query
+          schema: { type: integer, default: 10 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StartupProfileList"
+
+  # ── OPEN ROLES ────────────────────────────────────────────────────────────────
+  /roles:
+    get:
+      operationId: listRoles
+      tags: [roles]
+      parameters:
+        - name: startupId
+          in: query
+          schema: { type: integer }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoleList"
+    post:
+      operationId: createRole
+      tags: [roles]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRoleBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Role"
+
+  /roles/{id}:
+    get:
+      operationId: getRole
+      tags: [roles]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Role"
+    patch:
+      operationId: updateRole
+      tags: [roles]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateRoleBody"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Role"
+    delete:
+      operationId: deleteRole
+      tags: [roles]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
+
+  # ── SWIPES ────────────────────────────────────────────────────────────────────
+  /swipes:
+    post:
+      operationId: createSwipe
+      tags: [swipes]
+      summary: Record a swipe action
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSwipeBody"
+      responses:
+        "201":
+          description: Swipe recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SwipeResult"
+
+  /swipes/history:
+    get:
+      operationId: listMySwipes
+      tags: [swipes]
+      parameters:
+        - name: direction
+          in: query
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 50 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SwipeList"
+
+  # ── MATCHES ───────────────────────────────────────────────────────────────────
+  /matches:
+    get:
+      operationId: listMatches
+      tags: [matches]
+      summary: List all mutual matches for current user
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MatchList"
+
+  /matches/{id}:
+    get:
+      operationId: getMatch
+      tags: [matches]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Match"
+
+  # ── MESSAGES ──────────────────────────────────────────────────────────────────
+  /messages/{matchId}:
+    get:
+      operationId: listMessages
+      tags: [messages]
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 50 }
+        - name: before
+          in: query
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageList"
+    post:
+      operationId: sendMessage
+      tags: [messages]
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendMessageBody"
+      responses:
+        "201":
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+
+  # ── VIDEOS ────────────────────────────────────────────────────────────────────
+  /videos:
+    get:
+      operationId: listVideos
+      tags: [videos]
+      summary: TikTok-style founder video feed
+      parameters:
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: offset
+          in: query
+          schema: { type: integer, default: 0 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VideoList"
+    post:
+      operationId: createVideo
+      tags: [videos]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateVideoBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Video"
+
+  /videos/{id}/like:
+    post:
+      operationId: likeVideo
+      tags: [videos]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Video"
+
+  # ── NOTIFICATIONS ─────────────────────────────────────────────────────────────
+  /notifications:
+    get:
+      operationId: listNotifications
+      tags: [notifications]
+      parameters:
+        - name: unreadOnly
+          in: query
+          schema: { type: boolean }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationList"
+
+  /notifications/read-all:
+    post:
+      operationId: markAllNotificationsRead
+      tags: [notifications]
+      responses:
+        "204":
+          description: OK
+
+  # ── SUBSCRIPTIONS ─────────────────────────────────────────────────────────────
+  /subscriptions/plans:
+    get:
+      operationId: listPlans
+      tags: [subscriptions]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlanList"
+
+  /subscriptions/current:
+    get:
+      operationId: getCurrentSubscription
+      tags: [subscriptions]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+
+  /subscriptions/checkout:
+    post:
+      operationId: createCheckoutSession
+      tags: [subscriptions]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCheckoutBody"
+      responses:
+        "200":
+          description: Stripe checkout session created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckoutSession"
+
+  # ── AI ENDPOINTS ──────────────────────────────────────────────────────────────
+  /ai/match-score:
+    post:
+      operationId: getAiMatchScore
+      tags: [ai]
+      summary: Get AI compatibility score between talent and startup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AiMatchScoreBody"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiMatchScore"
+
+  /ai/interview-prep:
+    post:
+      operationId: getInterviewPrep
+      tags: [ai]
+      summary: Generate interview prep for a match
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InterviewPrepBody"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InterviewPrep"
+
+  /ai/profile-optimize:
+    post:
+      operationId: optimizeProfile
+      tags: [ai]
+      summary: AI profile optimization suggestions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OptimizeProfileBody"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileOptimization"
+
+  # ── ANALYTICS (WOW) ───────────────────────────────────────────────────────────
+  /analytics/platform-stats:
+    get:
+      operationId: getPlatformStats
+      tags: [analytics]
+      summary: Admin platform overview stats
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformStats"
+
+  /analytics/match-funnel:
+    get:
+      operationId: getMatchFunnel
+      tags: [analytics]
+      summary: Match funnel analytics
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MatchFunnel"
+
+  /analytics/my-stats:
+    get:
+      operationId: getMyStats
+      tags: [analytics]
+      summary: Stats for current user
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserStats"
+
 components:
   schemas:
     HealthStatus:
       type: object
       properties:
-        status:
-          type: string
-      required:
-        - status
+        status: { type: string }
+      required: [status]
 
+    # ── USER ──────────────────────────────────────────────────────────────────
+    User:
+      type: object
+      properties:
+        id: { type: integer }
+        email: { type: string }
+        name: { type: string }
+        userType: { type: string }
+        avatarUrl: { type: ["string", "null"] }
+        isAdmin: { type: boolean }
+        isVerified: { type: boolean }
+        subscriptionTier: { type: ["string", "null"] }
+        personalityType: { type: ["string", "null"] }
+        onboardingComplete: { type: boolean }
+        createdAt: { type: string }
+      required: [id, email, name, userType, isAdmin, isVerified, onboardingComplete, createdAt]
+
+    UserList:
+      type: object
+      properties:
+        users:
+          type: array
+          items: { $ref: "#/components/schemas/User" }
+        total: { type: integer }
+      required: [users, total]
+
+    RegisterUserBody:
+      type: object
+      properties:
+        email: { type: string }
+        password: { type: string }
+        name: { type: string }
+        userType: { type: string }
+      required: [email, password, name, userType]
+
+    LoginUserBody:
+      type: object
+      properties:
+        email: { type: string }
+        password: { type: string }
+      required: [email, password]
+
+    UpdateUserBody:
+      type: object
+      properties:
+        name: { type: string }
+        avatarUrl: { type: string }
+        personalityType: { type: string }
+        onboardingComplete: { type: boolean }
+
+    # ── TALENT PROFILE ────────────────────────────────────────────────────────
+    TalentProfile:
+      type: object
+      properties:
+        id: { type: integer }
+        userId: { type: integer }
+        fullName: { type: string }
+        headline: { type: ["string", "null"] }
+        bio: { type: ["string", "null"] }
+        skills: { type: array, items: { type: string } }
+        yearsExperience: { type: ["integer", "null"] }
+        pastCompanies: { type: array, items: { type: string } }
+        desiredRoles: { type: array, items: { type: string } }
+        salaryMin: { type: ["integer", "null"] }
+        salaryMax: { type: ["integer", "null"] }
+        equityExpectation: { type: ["string", "null"] }
+        preferredIndustries: { type: array, items: { type: string } }
+        remotePreference: { type: ["string", "null"] }
+        city: { type: ["string", "null"] }
+        linkedinUrl: { type: ["string", "null"] }
+        portfolioUrl: { type: ["string", "null"] }
+        whyStartups: { type: ["string", "null"] }
+        availabilityDate: { type: ["string", "null"] }
+        workStyle: { type: ["string", "null"] }
+        personalityType: { type: ["string", "null"] }
+        willingToRelocate: { type: boolean }
+        visaStatus: { type: ["string", "null"] }
+        cofoundingOpen: { type: boolean }
+        momentumScore: { type: integer }
+        profileStrength: { type: integer }
+        avatarUrl: { type: ["string", "null"] }
+        createdAt: { type: string }
+      required: [id, userId, fullName, skills, pastCompanies, desiredRoles, preferredIndustries, willingToRelocate, cofoundingOpen, momentumScore, profileStrength, createdAt]
+
+    TalentProfileList:
+      type: object
+      properties:
+        profiles:
+          type: array
+          items: { $ref: "#/components/schemas/TalentProfile" }
+        total: { type: integer }
+      required: [profiles, total]
+
+    CreateTalentProfileBody:
+      type: object
+      properties:
+        fullName: { type: string }
+        headline: { type: string }
+        bio: { type: string }
+        skills: { type: array, items: { type: string } }
+        yearsExperience: { type: integer }
+        pastCompanies: { type: array, items: { type: string } }
+        desiredRoles: { type: array, items: { type: string } }
+        salaryMin: { type: integer }
+        salaryMax: { type: integer }
+        equityExpectation: { type: string }
+        preferredIndustries: { type: array, items: { type: string } }
+        remotePreference: { type: string }
+        city: { type: string }
+        linkedinUrl: { type: string }
+        portfolioUrl: { type: string }
+        whyStartups: { type: string }
+        availabilityDate: { type: string }
+        workStyle: { type: string }
+        personalityType: { type: string }
+        willingToRelocate: { type: boolean }
+        visaStatus: { type: string }
+        cofoundingOpen: { type: boolean }
+        avatarUrl: { type: string }
+      required: [fullName]
+
+    UpdateTalentProfileBody:
+      type: object
+      properties:
+        fullName: { type: string }
+        headline: { type: string }
+        bio: { type: string }
+        skills: { type: array, items: { type: string } }
+        yearsExperience: { type: integer }
+        pastCompanies: { type: array, items: { type: string } }
+        desiredRoles: { type: array, items: { type: string } }
+        salaryMin: { type: integer }
+        salaryMax: { type: integer }
+        equityExpectation: { type: string }
+        preferredIndustries: { type: array, items: { type: string } }
+        remotePreference: { type: string }
+        city: { type: string }
+        linkedinUrl: { type: string }
+        portfolioUrl: { type: string }
+        whyStartups: { type: string }
+        availabilityDate: { type: string }
+        workStyle: { type: string }
+        personalityType: { type: string }
+        willingToRelocate: { type: boolean }
+        visaStatus: { type: string }
+        cofoundingOpen: { type: boolean }
+        avatarUrl: { type: string }
+
+    # ── STARTUP PROFILE ──────────────────────────────────────────────────────
+    StartupProfile:
+      type: object
+      properties:
+        id: { type: integer }
+        userId: { type: integer }
+        founderName: { type: string }
+        companyName: { type: string }
+        logoUrl: { type: ["string", "null"] }
+        mission: { type: ["string", "null"] }
+        elevatorPitch: { type: ["string", "null"] }
+        industry: { type: ["string", "null"] }
+        stage: { type: ["string", "null"] }
+        fundingRaised: { type: ["integer", "null"] }
+        investors: { type: array, items: { type: string } }
+        teamSize: { type: ["integer", "null"] }
+        salaryBandMin: { type: ["integer", "null"] }
+        salaryBandMax: { type: ["integer", "null"] }
+        equityOffered: { type: ["string", "null"] }
+        location: { type: ["string", "null"] }
+        remoteOptions: { type: ["string", "null"] }
+        cultureStyle: { type: ["string", "null"] }
+        whyJoinNow: { type: ["string", "null"] }
+        growthMetrics: { type: ["string", "null"] }
+        websiteUrl: { type: ["string", "null"] }
+        twitterUrl: { type: ["string", "null"] }
+        linkedinUrl: { type: ["string", "null"] }
+        badges: { type: array, items: { type: string } }
+        heatScore: { type: integer }
+        isVerified: { type: boolean }
+        isFeatured: { type: boolean }
+        isSecret: { type: boolean }
+        createdAt: { type: string }
+      required: [id, userId, founderName, companyName, investors, badges, heatScore, isVerified, isFeatured, isSecret, createdAt]
+
+    StartupProfileList:
+      type: object
+      properties:
+        profiles:
+          type: array
+          items: { $ref: "#/components/schemas/StartupProfile" }
+        total: { type: integer }
+      required: [profiles, total]
+
+    CreateStartupProfileBody:
+      type: object
+      properties:
+        founderName: { type: string }
+        companyName: { type: string }
+        logoUrl: { type: string }
+        mission: { type: string }
+        elevatorPitch: { type: string }
+        industry: { type: string }
+        stage: { type: string }
+        fundingRaised: { type: integer }
+        investors: { type: array, items: { type: string } }
+        teamSize: { type: integer }
+        salaryBandMin: { type: integer }
+        salaryBandMax: { type: integer }
+        equityOffered: { type: string }
+        location: { type: string }
+        remoteOptions: { type: string }
+        cultureStyle: { type: string }
+        whyJoinNow: { type: string }
+        growthMetrics: { type: string }
+        websiteUrl: { type: string }
+        twitterUrl: { type: string }
+        linkedinUrl: { type: string }
+      required: [founderName, companyName]
+
+    UpdateStartupProfileBody:
+      type: object
+      properties:
+        founderName: { type: string }
+        companyName: { type: string }
+        logoUrl: { type: string }
+        mission: { type: string }
+        elevatorPitch: { type: string }
+        industry: { type: string }
+        stage: { type: string }
+        fundingRaised: { type: integer }
+        investors: { type: array, items: { type: string } }
+        teamSize: { type: integer }
+        salaryBandMin: { type: integer }
+        salaryBandMax: { type: integer }
+        equityOffered: { type: string }
+        location: { type: string }
+        remoteOptions: { type: string }
+        cultureStyle: { type: string }
+        whyJoinNow: { type: string }
+        growthMetrics: { type: string }
+        websiteUrl: { type: string }
+        twitterUrl: { type: string }
+        linkedinUrl: { type: string }
+        isSecret: { type: boolean }
+        isFeatured: { type: boolean }
+
+    # ── ROLE ─────────────────────────────────────────────────────────────────
+    Role:
+      type: object
+      properties:
+        id: { type: integer }
+        startupId: { type: integer }
+        title: { type: string }
+        description: { type: ["string", "null"] }
+        roleType: { type: ["string", "null"] }
+        salaryMin: { type: ["integer", "null"] }
+        salaryMax: { type: ["integer", "null"] }
+        equityMin: { type: ["string", "null"] }
+        equityMax: { type: ["string", "null"] }
+        remote: { type: boolean }
+        skills: { type: array, items: { type: string } }
+        isActive: { type: boolean }
+        createdAt: { type: string }
+      required: [id, startupId, title, remote, skills, isActive, createdAt]
+
+    RoleList:
+      type: object
+      properties:
+        roles:
+          type: array
+          items: { $ref: "#/components/schemas/Role" }
+        total: { type: integer }
+      required: [roles, total]
+
+    CreateRoleBody:
+      type: object
+      properties:
+        startupId: { type: integer }
+        title: { type: string }
+        description: { type: string }
+        roleType: { type: string }
+        salaryMin: { type: integer }
+        salaryMax: { type: integer }
+        equityMin: { type: string }
+        equityMax: { type: string }
+        remote: { type: boolean }
+        skills: { type: array, items: { type: string } }
+      required: [startupId, title]
+
+    UpdateRoleBody:
+      type: object
+      properties:
+        title: { type: string }
+        description: { type: string }
+        roleType: { type: string }
+        salaryMin: { type: integer }
+        salaryMax: { type: integer }
+        equityMin: { type: string }
+        equityMax: { type: string }
+        remote: { type: boolean }
+        skills: { type: array, items: { type: string } }
+        isActive: { type: boolean }
+
+    # ── SWIPE ────────────────────────────────────────────────────────────────
+    CreateSwipeBody:
+      type: object
+      properties:
+        targetId: { type: integer }
+        targetType: { type: string }
+        direction: { type: string }
+      required: [targetId, targetType, direction]
+
+    SwipeResult:
+      type: object
+      properties:
+        id: { type: integer }
+        matched: { type: boolean }
+        matchId: { type: ["integer", "null"] }
+        direction: { type: string }
+        createdAt: { type: string }
+      required: [id, matched, direction, createdAt]
+
+    SwipeList:
+      type: object
+      properties:
+        swipes:
+          type: array
+          items: { $ref: "#/components/schemas/SwipeResult" }
+        total: { type: integer }
+      required: [swipes, total]
+
+    # ── MATCH ────────────────────────────────────────────────────────────────
+    Match:
+      type: object
+      properties:
+        id: { type: integer }
+        talentUserId: { type: integer }
+        startupUserId: { type: integer }
+        talentProfile: { $ref: "#/components/schemas/TalentProfile" }
+        startupProfile: { $ref: "#/components/schemas/StartupProfile" }
+        aiMatchScore: { type: ["integer", "null"] }
+        aiMatchReason: { type: ["string", "null"] }
+        status: { type: string }
+        lastMessageAt: { type: ["string", "null"] }
+        createdAt: { type: string }
+      required: [id, talentUserId, startupUserId, talentProfile, startupProfile, status, createdAt]
+
+    MatchList:
+      type: object
+      properties:
+        matches:
+          type: array
+          items: { $ref: "#/components/schemas/Match" }
+        total: { type: integer }
+      required: [matches, total]
+
+    # ── MESSAGE ──────────────────────────────────────────────────────────────
+    Message:
+      type: object
+      properties:
+        id: { type: integer }
+        matchId: { type: integer }
+        senderId: { type: integer }
+        content: { type: string }
+        messageType: { type: string }
+        isRead: { type: boolean }
+        createdAt: { type: string }
+      required: [id, matchId, senderId, content, messageType, isRead, createdAt]
+
+    MessageList:
+      type: object
+      properties:
+        messages:
+          type: array
+          items: { $ref: "#/components/schemas/Message" }
+        total: { type: integer }
+      required: [messages, total]
+
+    SendMessageBody:
+      type: object
+      properties:
+        content: { type: string }
+        messageType: { type: string }
+      required: [content]
+
+    # ── VIDEO ────────────────────────────────────────────────────────────────
+    Video:
+      type: object
+      properties:
+        id: { type: integer }
+        startupId: { type: integer }
+        startupProfile: { $ref: "#/components/schemas/StartupProfile" }
+        title: { type: string }
+        videoUrl: { type: ["string", "null"] }
+        thumbnailUrl: { type: ["string", "null"] }
+        description: { type: ["string", "null"] }
+        duration: { type: ["integer", "null"] }
+        views: { type: integer }
+        likes: { type: integer }
+        createdAt: { type: string }
+      required: [id, startupId, startupProfile, title, views, likes, createdAt]
+
+    VideoList:
+      type: object
+      properties:
+        videos:
+          type: array
+          items: { $ref: "#/components/schemas/Video" }
+        total: { type: integer }
+      required: [videos, total]
+
+    CreateVideoBody:
+      type: object
+      properties:
+        startupId: { type: integer }
+        title: { type: string }
+        videoUrl: { type: string }
+        thumbnailUrl: { type: string }
+        description: { type: string }
+        duration: { type: integer }
+      required: [startupId, title]
+
+    # ── NOTIFICATION ─────────────────────────────────────────────────────────
+    Notification:
+      type: object
+      properties:
+        id: { type: integer }
+        userId: { type: integer }
+        type: { type: string }
+        title: { type: string }
+        body: { type: string }
+        isRead: { type: boolean }
+        relatedId: { type: ["integer", "null"] }
+        createdAt: { type: string }
+      required: [id, userId, type, title, body, isRead, createdAt]
+
+    NotificationList:
+      type: object
+      properties:
+        notifications:
+          type: array
+          items: { $ref: "#/components/schemas/Notification" }
+        unreadCount: { type: integer }
+      required: [notifications, unreadCount]
+
+    # ── SUBSCRIPTION ─────────────────────────────────────────────────────────
+    Plan:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string }
+        price: { type: integer }
+        interval: { type: string }
+        features: { type: array, items: { type: string } }
+        tier: { type: string }
+        popular: { type: boolean }
+      required: [id, name, description, price, interval, features, tier, popular]
+
+    PlanList:
+      type: object
+      properties:
+        plans:
+          type: array
+          items: { $ref: "#/components/schemas/Plan" }
+      required: [plans]
+
+    Subscription:
+      type: object
+      properties:
+        id: { type: integer }
+        userId: { type: integer }
+        tier: { type: string }
+        status: { type: string }
+        currentPeriodEnd: { type: ["string", "null"] }
+        cancelAtPeriodEnd: { type: boolean }
+        createdAt: { type: string }
+      required: [id, userId, tier, status, cancelAtPeriodEnd, createdAt]
+
+    CreateCheckoutBody:
+      type: object
+      properties:
+        planId: { type: string }
+        successUrl: { type: string }
+        cancelUrl: { type: string }
+      required: [planId]
+
+    CheckoutSession:
+      type: object
+      properties:
+        sessionId: { type: string }
+        url: { type: string }
+      required: [sessionId, url]
+
+    # ── AI ────────────────────────────────────────────────────────────────────
+    AiMatchScoreBody:
+      type: object
+      properties:
+        talentId: { type: integer }
+        startupId: { type: integer }
+      required: [talentId, startupId]
+
+    AiMatchScore:
+      type: object
+      properties:
+        score: { type: integer }
+        reason: { type: string }
+        highlights: { type: array, items: { type: string } }
+        redFlags: { type: array, items: { type: string } }
+        talkingPoints: { type: array, items: { type: string } }
+      required: [score, reason, highlights, redFlags, talkingPoints]
+
+    InterviewPrepBody:
+      type: object
+      properties:
+        matchId: { type: integer }
+      required: [matchId]
+
+    InterviewPrep:
+      type: object
+      properties:
+        questions: { type: array, items: { type: string } }
+        founderBackground: { type: string }
+        companyTalkingPoints: { type: array, items: { type: string } }
+        smartQuestions: { type: array, items: { type: string } }
+      required: [questions, founderBackground, companyTalkingPoints, smartQuestions]
+
+    OptimizeProfileBody:
+      type: object
+      properties:
+        userId: { type: integer }
+      required: [userId]
+
+    ProfileOptimization:
+      type: object
+      properties:
+        overallScore: { type: integer }
+        suggestions: { type: array, items: { type: string } }
+        strengths: { type: array, items: { type: string } }
+        improvements: { type: array, items: { type: string } }
+      required: [overallScore, suggestions, strengths, improvements]
+
+    # ── ANALYTICS ────────────────────────────────────────────────────────────
+    PlatformStats:
+      type: object
+      properties:
+        totalUsers: { type: integer }
+        totalTalent: { type: integer }
+        totalStartups: { type: integer }
+        totalMatches: { type: integer }
+        totalSwipes: { type: integer }
+        matchRate: { type: integer }
+        avgMatchScore: { type: integer }
+        revenueMonthly: { type: integer }
+        activeSubscriptions: { type: integer }
+      required: [totalUsers, totalTalent, totalStartups, totalMatches, totalSwipes, matchRate, avgMatchScore, revenueMonthly, activeSubscriptions]
+
+    MatchFunnel:
+      type: object
+      properties:
+        swipes: { type: integer }
+        rightSwipes: { type: integer }
+        mutualMatches: { type: integer }
+        conversations: { type: integer }
+        interviews: { type: integer }
+        hires: { type: integer }
+      required: [swipes, rightSwipes, mutualMatches, conversations, interviews, hires]
+
+    UserStats:
+      type: object
+      properties:
+        swipesSent: { type: integer }
+        swipesReceived: { type: integer }
+        matches: { type: integer }
+        messagesSent: { type: integer }
+        profileViews: { type: integer }
+        momentumScore: { type: integer }
+        heatScore: { type: integer }
+      required: [swipesSent, swipesReceived, matches, messagesSent, profileViews, momentumScore, heatScore]
