@@ -22,6 +22,12 @@ const loginSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
+const DEMO_ACCOUNTS = [
+  { label: "Talent", email: "demo@talent.com", color: "from-blue-500 to-cyan-500" },
+  { label: "Founder", email: "demo@founder.com", color: "from-purple-500 to-pink-500" },
+  { label: "Admin", email: "admin@foundrMatch.com", color: "from-amber-500 to-orange-500" },
+] as const;
+
 export default function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -34,6 +40,24 @@ export default function Login() {
       password: "",
     },
   });
+
+  function loginAs(email: string) {
+    loginUser.mutate(
+      { data: { email, password: "password123" } },
+      {
+        onSuccess: (data) => {
+          if (!data.onboardingComplete) {
+            setLocation("/onboarding");
+          } else {
+            setLocation("/swipe");
+          }
+        },
+        onError: () => {
+          toast({ variant: "destructive", title: "Demo login failed", description: "Please try again." });
+        },
+      }
+    );
+  }
 
   function onSubmit(values: z.infer<typeof loginSchema>) {
     loginUser.mutate(
@@ -76,6 +100,28 @@ export default function Login() {
           </div>
           <h2 className="text-3xl font-bold tracking-tight">Welcome back</h2>
           <p className="text-muted-foreground">Sign in to your account</p>
+        </div>
+
+        <div className="space-y-3">
+          <p className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">Try a demo account</p>
+          <div className="grid grid-cols-3 gap-2">
+            {DEMO_ACCOUNTS.map((account) => (
+              <button
+                key={account.email}
+                type="button"
+                onClick={() => loginAs(account.email)}
+                disabled={loginUser.isPending}
+                className={`relative h-10 rounded-xl bg-gradient-to-r ${account.color} text-white text-sm font-semibold transition-all hover:opacity-90 hover:scale-105 active:scale-95 disabled:opacity-50 shadow-md`}
+              >
+                {account.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px bg-border/50" />
+            <span className="text-xs text-muted-foreground">or sign in manually</span>
+            <div className="flex-1 h-px bg-border/50" />
+          </div>
         </div>
 
         <Form {...form}>
