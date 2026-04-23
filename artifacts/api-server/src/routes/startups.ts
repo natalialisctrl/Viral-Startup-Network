@@ -60,12 +60,19 @@ router.post("/startups/me", async (req, res): Promise<void> => {
     return;
   }
 
-  const [profile] = await db.insert(startupProfilesTable).values({
-    userId,
-    ...parsed.data,
-  }).returning();
-
-  res.status(201).json(profile);
+  try {
+    const [profile] = await db
+      .insert(startupProfilesTable)
+      .values({ userId, ...parsed.data })
+      .onConflictDoUpdate({
+        target: startupProfilesTable.userId,
+        set: parsed.data,
+      })
+      .returning();
+    res.status(201).json(profile);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message ?? "Failed to create startup profile" });
+  }
 });
 
 router.patch("/startups/me", async (req, res): Promise<void> => {

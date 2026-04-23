@@ -66,14 +66,20 @@ router.post("/talent/me", async (req, res): Promise<void> => {
     return;
   }
 
-  const strength = calcProfileStrength(parsed.data);
-  const [profile] = await db.insert(talentProfilesTable).values({
-    userId,
-    ...parsed.data,
-    profileStrength: strength,
-  }).returning();
-
-  res.status(201).json(profile);
+  try {
+    const strength = calcProfileStrength(parsed.data);
+    const [profile] = await db
+      .insert(talentProfilesTable)
+      .values({ userId, ...parsed.data, profileStrength: strength })
+      .onConflictDoUpdate({
+        target: talentProfilesTable.userId,
+        set: { ...parsed.data, profileStrength: strength },
+      })
+      .returning();
+    res.status(201).json(profile);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message ?? "Failed to create talent profile" });
+  }
 });
 
 router.patch("/talent/me", async (req, res): Promise<void> => {
