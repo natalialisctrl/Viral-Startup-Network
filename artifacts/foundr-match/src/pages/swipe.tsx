@@ -1,12 +1,13 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { AppLayout } from "@/components/layout";
 import { useAuth } from "@/context/AuthContext";
 import { useListTalent, useListStartups, useCreateSwipe, useGetMyTalentProfile, useGetMyStartupProfile } from "@workspace/api-client-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Heart, X, Star, Bookmark, Zap, MessageCircle, User, ExternalLink, MapPin, Briefcase, ChevronDown, Flame, TrendingUp, Users } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Heart, X, Star, Bookmark, Zap, MessageCircle, User, ExternalLink, MapPin, Briefcase, ChevronDown, Flame, TrendingUp, Users, SlidersHorizontal } from "lucide-react";
 import { useLocation } from "wouter";
 
 // ── Deterministic AI scoring ──────────────────────────────────────────────────
@@ -368,6 +369,92 @@ function StatPill({ icon: Icon, label, value }: { icon: any; label: string; valu
   );
 }
 
+// ── Location filter sheet ─────────────────────────────────────────────────────
+const RADII = ["10 mi", "25 mi", "50 mi", "100 mi", "Anywhere"] as const;
+type Radius = typeof RADII[number];
+
+interface LocationFilter { city: string; radius: Radius }
+
+function LocationFilterSheet({
+  filter, onApply, onClose,
+}: { filter: LocationFilter; onApply: (f: LocationFilter) => void; onClose: () => void }) {
+  const [city, setCity] = useState(filter.city);
+  const [radius, setRadius] = useState<Radius>(filter.radius);
+
+  const handleApply = () => { onApply({ city: city.trim(), radius }); onClose(); };
+  const handleClear = () => { onApply({ city: "", radius: "Anywhere" }); onClose(); };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-40"
+      style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)" }}
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+        transition={{ type: "spring", stiffness: 320, damping: 32 }}
+        onClick={e => e.stopPropagation()}
+        className="absolute bottom-0 left-0 right-0 bg-[#0d0d0d] border-t border-white/10 rounded-t-[28px] p-6 space-y-6"
+      >
+        <div className="flex justify-center -mt-1 mb-1">
+          <div className="w-10 h-1 rounded-full bg-white/20" />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-bold">Location Filter</h3>
+          <button onClick={onClose} className="p-1.5 rounded-full bg-white/8 hover:bg-white/14 transition-colors">
+            <X className="h-4 w-4 text-muted-foreground" />
+          </button>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium">City</label>
+          <div className="relative">
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="e.g. San Francisco, Austin…"
+              value={city}
+              onChange={e => setCity(e.target.value)}
+              className="pl-9 bg-white/5 border-white/15 focus:border-white/40 rounded-xl h-11"
+              onKeyDown={e => e.key === "Enter" && handleApply()}
+              autoFocus
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Radius</label>
+          <div className="flex gap-2 flex-wrap">
+            {RADII.map(r => (
+              <button
+                key={r}
+                onClick={() => setRadius(r)}
+                className={`px-4 py-2 rounded-full text-sm font-medium border transition-all ${
+                  radius === r
+                    ? "bg-white text-black border-white"
+                    : "bg-white/5 border-white/15 text-muted-foreground hover:bg-white/10 hover:text-foreground"
+                }`}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex gap-3 pt-1">
+          <Button variant="outline" className="flex-1 border-white/15 rounded-xl h-12" onClick={handleClear}>
+            Clear
+          </Button>
+          <Button className="flex-1 rounded-xl h-12" onClick={handleApply}>
+            Apply Filter
+          </Button>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 // ── Main Swipe Page ────────────────────────────────────────────────────────────
 export default function Swipe() {
   const { user } = useAuth();
@@ -384,11 +471,25 @@ export default function Swipe() {
   const [matchModal, setMatchModal] = useState<{ card: any; score: number; matchId: number } | null>(null);
   const [dragX, setDragX] = useState(0);
   const [expandedCard, setExpandedCard] = useState<any | null>(null);
+  const [showLocationFilter, setShowLocationFilter] = useState(false);
+  const [locationFilter, setLocationFilter] = useState<LocationFilter>({ city: "", radius: "Anywhere" });
   const isDragging = useRef(false);
 
-  const cards = isTalent ? startupData?.profiles || [] : talentData?.profiles || [];
+  const allCards = isTalent ? startupData?.profiles || [] : talentData?.profiles || [];
   const isLoading = isTalent ? isLoadingStartups : isLoadingTalent;
   const myId = user?.id ?? 1;
+
+  const cards = useMemo(() => {
+    if (!locationFilter.city) return allCards;
+    const q = locationFilter.city.toLowerCase();
+    return allCards.filter((c: any) => {
+      const loc = (c.city || c.location || "").toLowerCase();
+      return loc.includes(q);
+    });
+  }, [allCards, locationFilter.city]);
+
+  useEffect(() => { setCurrentIndex(0); }, [locationFilter]);
+
   const currentCard = cards[currentIndex];
 
   useEffect(() => {
@@ -434,8 +535,20 @@ export default function Swipe() {
           <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mb-6">
             <Star className="h-10 w-10 text-muted-foreground" />
           </div>
-          <h2 className="text-2xl font-bold mb-2">You're all caught up!</h2>
-          <p className="text-muted-foreground max-w-md">Check back later for more potential matches.</p>
+          {locationFilter.city ? (
+            <>
+              <h2 className="text-2xl font-bold mb-2">No results near {locationFilter.city}</h2>
+              <p className="text-muted-foreground max-w-md mb-6">Try a different city or expand your radius.</p>
+              <Button onClick={() => setLocationFilter({ city: "", radius: "Anywhere" })}>
+                <MapPin className="h-4 w-4 mr-2" /> Show everyone
+              </Button>
+            </>
+          ) : (
+            <>
+              <h2 className="text-2xl font-bold mb-2">You're all caught up!</h2>
+              <p className="text-muted-foreground max-w-md">Check back later for more potential matches.</p>
+            </>
+          )}
         </div>
       </AppLayout>
     );
@@ -450,6 +563,17 @@ export default function Swipe() {
 
   return (
     <AppLayout>
+      {/* ── Location Filter Sheet ── */}
+      <AnimatePresence>
+        {showLocationFilter && (
+          <LocationFilterSheet
+            filter={locationFilter}
+            onApply={setLocationFilter}
+            onClose={() => setShowLocationFilter(false)}
+          />
+        )}
+      </AnimatePresence>
+
       {/* ── Profile Sheet ── */}
       <AnimatePresence>
         {expandedCard && (
@@ -532,6 +656,43 @@ export default function Swipe() {
 
       {/* ── Swipe Area ── */}
       <div className="h-[calc(100vh-80px)] flex flex-col items-center justify-center p-4 overflow-hidden">
+
+        {/* Location filter pill */}
+        <div className="flex items-center gap-2 mb-4 w-full max-w-md">
+          <motion.button
+            whileTap={{ scale: 0.96 }}
+            onClick={() => setShowLocationFilter(true)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all ${
+              locationFilter.city
+                ? "bg-white text-black border-white"
+                : "bg-white/5 border-white/15 text-muted-foreground hover:bg-white/10 hover:text-foreground"
+            }`}
+          >
+            <MapPin className="h-3.5 w-3.5 shrink-0" />
+            <span>
+              {locationFilter.city
+                ? `${locationFilter.city}${locationFilter.radius !== "Anywhere" ? ` · ${locationFilter.radius}` : ""}`
+                : "Anywhere"}
+            </span>
+            <SlidersHorizontal className="h-3.5 w-3.5 shrink-0 opacity-60" />
+          </motion.button>
+          {locationFilter.city && (
+            <motion.button
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              onClick={() => setLocationFilter({ city: "", radius: "Anywhere" })}
+              className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+            >
+              <X className="h-3.5 w-3.5" />
+            </motion.button>
+          )}
+          {locationFilter.city && (
+            <span className="ml-auto text-xs text-muted-foreground">
+              {cards.length} {cards.length === 1 ? "result" : "results"}
+            </span>
+          )}
+        </div>
+
         <div className="relative w-full max-w-md h-[70vh] md:h-[600px]">
           {cards[currentIndex + 1] && (
             <div className="absolute inset-2 rounded-2xl bg-card border border-border/20 opacity-30 scale-95" />
