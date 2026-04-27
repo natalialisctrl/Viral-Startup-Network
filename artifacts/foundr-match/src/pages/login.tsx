@@ -15,25 +15,31 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
-import { useDemoLogin } from "@/hooks/use-demo-login";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-const DEMO_ACCOUNTS = [
-  { label: "Talent", email: "demo@talent.com", color: "from-zinc-200 to-zinc-400" },
-  { label: "Founder", email: "demo@founder.com", color: "from-zinc-700 to-zinc-900" },
-  { label: "Admin", email: "admin@foundrMatch.com", color: "from-zinc-600 to-zinc-800" },
+const DEMO_PERSONAS = [
+  {
+    email: "demo@talent.com",
+    emoji: "🧑‍💻",
+    title: "Job Seeker",
+    desc: "Browse startups & apply",
+  },
+  {
+    email: "demo@founder.com",
+    emoji: "🚀",
+    title: "Founder",
+    desc: "Hire world-class talent",
+  },
 ] as const;
 
 export default function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const loginUser = useLoginUser();
-  const { handleDemoLogin, isDemoLoading } = useDemoLogin();
-
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -102,17 +108,19 @@ export default function Login() {
         </div>
 
         <div className="space-y-3">
-          <p className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">Try a demo account</p>
-          <div className="grid grid-cols-3 gap-2">
-            {DEMO_ACCOUNTS.map((account) => (
+          <p className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">Try a demo — no signup needed</p>
+          <div className="grid grid-cols-2 gap-3">
+            {DEMO_PERSONAS.map((persona) => (
               <button
-                key={account.email}
+                key={persona.email}
                 type="button"
-                onClick={() => loginAs(account.email)}
+                onClick={() => loginAs(persona.email)}
                 disabled={loginUser.isPending}
-                className={`relative h-10 rounded-xl bg-gradient-to-r ${account.color} text-white text-sm font-semibold transition-all hover:opacity-90 hover:scale-105 active:scale-95 disabled:opacity-50 shadow-md`}
+                className="flex flex-col items-center gap-1.5 py-4 px-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/25 active:scale-95 transition-all disabled:opacity-50 group"
               >
-                {account.label}
+                <span className="text-2xl">{persona.emoji}</span>
+                <span className="text-sm font-bold text-foreground">{persona.title}</span>
+                <span className="text-xs text-muted-foreground text-center leading-tight">{persona.desc}</span>
               </button>
             ))}
           </div>
@@ -160,22 +168,6 @@ export default function Login() {
             </Button>
           </form>
         </Form>
-
-        <div className="relative flex items-center gap-3">
-          <div className="flex-1 border-t border-border/50" />
-          <span className="text-xs text-muted-foreground uppercase tracking-wider">or</span>
-          <div className="flex-1 border-t border-border/50" />
-        </div>
-
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full h-12 rounded-xl text-base font-semibold border-border/50 bg-background/50 hover:bg-primary/5 hover:border-primary/40 transition-all"
-          onClick={handleDemoLogin}
-          disabled={isDemoLoading || loginUser.isPending}
-        >
-          {isDemoLoading ? "Loading demo..." : "✨ Try Demo"}
-        </Button>
 
         <div className="text-center text-sm">
           <span className="text-muted-foreground">Don't have an account? </span>

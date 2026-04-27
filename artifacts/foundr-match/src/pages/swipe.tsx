@@ -369,85 +369,147 @@ function StatPill({ icon: Icon, label, value }: { icon: any; label: string; valu
   );
 }
 
-// ── Location filter sheet ─────────────────────────────────────────────────────
+// ── Filters ───────────────────────────────────────────────────────────────────
 const RADII = ["10 mi", "25 mi", "50 mi", "100 mi", "Anywhere"] as const;
 type Radius = typeof RADII[number];
 
-interface LocationFilter { city: string; radius: Radius }
+interface Filters {
+  city: string;
+  radius: Radius;
+  experience: string;
+  workStyle: string;
+  industry: string;
+}
 
-function LocationFilterSheet({
-  filter, onApply, onClose,
-}: { filter: LocationFilter; onApply: (f: LocationFilter) => void; onClose: () => void }) {
-  const [city, setCity] = useState(filter.city);
-  const [radius, setRadius] = useState<Radius>(filter.radius);
+const DEFAULT_FILTERS: Filters = { city: "", radius: "Anywhere", experience: "Any", workStyle: "Any", industry: "Any" };
 
-  const handleApply = () => { onApply({ city: city.trim(), radius }); onClose(); };
-  const handleClear = () => { onApply({ city: "", radius: "Anywhere" }); onClose(); };
+const EXP_OPTS = ["Any", "0–2 yrs", "3–5 yrs", "6–10 yrs", "10+ yrs"] as const;
+const STYLE_OPTS = ["Any", "Remote", "Hybrid", "On-site"] as const;
+const INDUSTRY_OPTS = ["Any", "AI / ML", "FinTech", "DevTools", "HealthTech", "SaaS", "Consumer", "EdTech", "Climate"] as const;
+
+function ChipRow({ options, value, onChange }: { options: readonly string[]; value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="flex gap-2 flex-wrap">
+      {options.map(o => (
+        <button key={o} onClick={() => onChange(o)}
+          className={`px-3.5 py-1.5 rounded-full text-sm font-medium border transition-all ${
+            value === o
+              ? "bg-white text-black border-white"
+              : "bg-white/5 border-white/12 text-muted-foreground hover:bg-white/10 hover:text-foreground"
+          }`}>
+          {o}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function FilterSheet({
+  filters, onApply, onClose, isTalent,
+}: { filters: Filters; onApply: (f: Filters) => void; onClose: () => void; isTalent: boolean }) {
+  const [local, setLocal] = useState<Filters>(filters);
+  const set = (k: keyof Filters) => (v: string) => setLocal(prev => ({ ...prev, [k]: v }));
+
+  const activeCount = [
+    local.city,
+    local.experience !== "Any" && "x",
+    local.workStyle !== "Any" && "x",
+    local.industry !== "Any" && "x",
+  ].filter(Boolean).length;
+
+  const handleApply = () => { onApply({ ...local, city: local.city.trim() }); onClose(); };
+  const handleClear = () => { onApply(DEFAULT_FILTERS); onClose(); };
 
   return (
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-40"
-      style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)" }}
+      style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(10px)" }}
       onClick={onClose}
     >
       <motion.div
         initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-        transition={{ type: "spring", stiffness: 320, damping: 32 }}
+        transition={{ type: "spring", stiffness: 300, damping: 32 }}
         onClick={e => e.stopPropagation()}
-        className="absolute bottom-0 left-0 right-0 bg-[#0d0d0d] border-t border-white/10 rounded-t-[28px] p-6 space-y-6"
+        className="absolute bottom-0 left-0 right-0 bg-[#0d0d0d] border-t border-white/10 rounded-t-[28px] flex flex-col"
+        style={{ maxHeight: "88dvh" }}
       >
-        <div className="flex justify-center -mt-1 mb-1">
+        {/* Handle */}
+        <div className="flex justify-center pt-3 pb-1 shrink-0">
           <div className="w-10 h-1 rounded-full bg-white/20" />
         </div>
 
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-bold">Location Filter</h3>
-          <button onClick={onClose} className="p-1.5 rounded-full bg-white/8 hover:bg-white/14 transition-colors">
-            <X className="h-4 w-4 text-muted-foreground" />
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-3 shrink-0">
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-bold">Filters</h3>
+            {activeCount > 0 && (
+              <span className="text-xs font-bold bg-white text-black rounded-full px-2 py-0.5">{activeCount}</span>
+            )}
+          </div>
+          <button onClick={handleClear} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            Clear all
           </button>
         </div>
 
-        <div className="space-y-2">
-          <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium">City</label>
-          <div className="relative">
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="e.g. San Francisco, Austin…"
-              value={city}
-              onChange={e => setCity(e.target.value)}
-              className="pl-9 bg-white/5 border-white/15 focus:border-white/40 rounded-xl h-11"
-              onKeyDown={e => e.key === "Enter" && handleApply()}
-              autoFocus
-            />
-          </div>
+        {/* Scrollable sections */}
+        <div className="overflow-y-auto flex-1 px-6 pb-32 space-y-7 overscroll-contain">
+
+          {/* Location */}
+          <section className="space-y-3">
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-semibold">Location</span>
+            </div>
+            <div className="relative">
+              <Input
+                placeholder="City, e.g. San Francisco…"
+                value={local.city}
+                onChange={e => set("city")(e.target.value)}
+                className="pl-4 bg-white/5 border-white/15 focus:border-white/40 rounded-xl h-11"
+                autoFocus
+              />
+            </div>
+            <ChipRow options={RADII} value={local.radius} onChange={v => set("radius")(v as Radius)} />
+          </section>
+
+          {/* Experience */}
+          <section className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Briefcase className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-semibold">{isTalent ? "Company Stage" : "Experience Level"}</span>
+            </div>
+            {isTalent ? (
+              <ChipRow options={["Any", "Pre-seed", "Seed", "Series A", "Series B+"]} value={local.experience} onChange={set("experience")} />
+            ) : (
+              <ChipRow options={EXP_OPTS} value={local.experience} onChange={set("experience")} />
+            )}
+          </section>
+
+          {/* Work Style */}
+          <section className="space-y-3">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-semibold">Work Style</span>
+            </div>
+            <ChipRow options={STYLE_OPTS} value={local.workStyle} onChange={set("workStyle")} />
+          </section>
+
+          {/* Main Interest / Industry */}
+          <section className="space-y-3 pb-2">
+            <div className="flex items-center gap-2">
+              <Zap className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-semibold">Main Interest</span>
+            </div>
+            <ChipRow options={INDUSTRY_OPTS} value={local.industry} onChange={set("industry")} />
+          </section>
+
         </div>
 
-        <div className="space-y-2">
-          <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Radius</label>
-          <div className="flex gap-2 flex-wrap">
-            {RADII.map(r => (
-              <button
-                key={r}
-                onClick={() => setRadius(r)}
-                className={`px-4 py-2 rounded-full text-sm font-medium border transition-all ${
-                  radius === r
-                    ? "bg-white text-black border-white"
-                    : "bg-white/5 border-white/15 text-muted-foreground hover:bg-white/10 hover:text-foreground"
-                }`}
-              >
-                {r}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex gap-3 pt-1">
-          <Button variant="outline" className="flex-1 border-white/15 rounded-xl h-12" onClick={handleClear}>
-            Clear
-          </Button>
-          <Button className="flex-1 rounded-xl h-12" onClick={handleApply}>
-            Apply Filter
+        {/* Sticky apply */}
+        <div className="absolute bottom-0 left-0 right-0 p-5 border-t border-white/8 bg-[#0d0d0d]/95 backdrop-blur-md">
+          <Button className="w-full h-13 rounded-2xl text-base font-semibold" onClick={handleApply}>
+            Apply Filters{activeCount > 0 ? ` (${activeCount} active)` : ""}
           </Button>
         </div>
       </motion.div>
@@ -471,8 +533,8 @@ export default function Swipe() {
   const [matchModal, setMatchModal] = useState<{ card: any; score: number; matchId: number } | null>(null);
   const [dragX, setDragX] = useState(0);
   const [expandedCard, setExpandedCard] = useState<any | null>(null);
-  const [showLocationFilter, setShowLocationFilter] = useState(false);
-  const [locationFilter, setLocationFilter] = useState<LocationFilter>({ city: "", radius: "Anywhere" });
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const isDragging = useRef(false);
 
   const allCards = isTalent ? startupData?.profiles || [] : talentData?.profiles || [];
@@ -480,15 +542,44 @@ export default function Swipe() {
   const myId = user?.id ?? 1;
 
   const cards = useMemo(() => {
-    if (!locationFilter.city) return allCards;
-    const q = locationFilter.city.toLowerCase();
     return allCards.filter((c: any) => {
-      const loc = (c.city || c.location || "").toLowerCase();
-      return loc.includes(q);
+      if (filters.city) {
+        const loc = (c.city || c.location || "").toLowerCase();
+        if (!loc.includes(filters.city.toLowerCase())) return false;
+      }
+      if (filters.experience !== "Any") {
+        if (isTalent) {
+          const stageMap: Record<string, string[]> = {
+            "Pre-seed": ["Pre-seed", "pre-seed", "Idea"],
+            "Seed": ["Seed", "seed"],
+            "Series A": ["Series A", "series a", "Series A+"],
+            "Series B+": ["Series B", "Series C", "series b", "series c", "Growth", "Late"],
+          };
+          const allowed = stageMap[filters.experience] ?? [];
+          if (!allowed.some(s => (c.stage || "").toLowerCase().includes(s.toLowerCase()))) return false;
+        } else {
+          const rangeMap: Record<string, [number, number]> = {
+            "0–2 yrs": [0, 2], "3–5 yrs": [3, 5], "6–10 yrs": [6, 10], "10+ yrs": [10, 99],
+          };
+          const [min, max] = rangeMap[filters.experience] ?? [0, 99];
+          const yrs = c.yearsExperience ?? 0;
+          if (yrs < min || yrs > max) return false;
+        }
+      }
+      if (filters.workStyle !== "Any") {
+        const remote = (c.remotePreference || c.remoteOptions || "").toLowerCase();
+        const ws = filters.workStyle.toLowerCase();
+        if (!remote.includes(ws)) return false;
+      }
+      if (filters.industry !== "Any") {
+        const ind = (c.industry || (c.skills ?? []).join(" ") || "").toLowerCase();
+        if (!ind.includes(filters.industry.toLowerCase().replace(" / ", "/"))) return false;
+      }
+      return true;
     });
-  }, [allCards, locationFilter.city]);
+  }, [allCards, filters, isTalent]);
 
-  useEffect(() => { setCurrentIndex(0); }, [locationFilter]);
+  useEffect(() => { setCurrentIndex(0); }, [filters]);
 
   const currentCard = cards[currentIndex];
 
@@ -535,12 +626,12 @@ export default function Swipe() {
           <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mb-6">
             <Star className="h-10 w-10 text-muted-foreground" />
           </div>
-          {locationFilter.city ? (
+          {[filters.city, filters.experience !== "Any" && "x", filters.workStyle !== "Any" && "x", filters.industry !== "Any" && "x"].filter(Boolean).length > 0 ? (
             <>
-              <h2 className="text-2xl font-bold mb-2">No results near {locationFilter.city}</h2>
-              <p className="text-muted-foreground max-w-md mb-6">Try a different city or expand your radius.</p>
-              <Button onClick={() => setLocationFilter({ city: "", radius: "Anywhere" })}>
-                <MapPin className="h-4 w-4 mr-2" /> Show everyone
+              <h2 className="text-2xl font-bold mb-2">No matches found</h2>
+              <p className="text-muted-foreground max-w-md mb-6">No profiles match your current filters. Try broadening your search.</p>
+              <Button onClick={() => setFilters(DEFAULT_FILTERS)}>
+                <SlidersHorizontal className="h-4 w-4 mr-2" /> Clear filters
               </Button>
             </>
           ) : (
@@ -563,13 +654,14 @@ export default function Swipe() {
 
   return (
     <AppLayout>
-      {/* ── Location Filter Sheet ── */}
+      {/* ── Filter Sheet ── */}
       <AnimatePresence>
-        {showLocationFilter && (
-          <LocationFilterSheet
-            filter={locationFilter}
-            onApply={setLocationFilter}
-            onClose={() => setShowLocationFilter(false)}
+        {showFilters && (
+          <FilterSheet
+            filters={filters}
+            onApply={setFilters}
+            onClose={() => setShowFilters(false)}
+            isTalent={isTalent}
           />
         )}
       </AnimatePresence>
@@ -657,41 +749,46 @@ export default function Swipe() {
       {/* ── Swipe Area ── */}
       <div className="h-[calc(100vh-80px)] flex flex-col items-center justify-center p-4 overflow-hidden">
 
-        {/* Location filter pill */}
-        <div className="flex items-center gap-2 mb-4 w-full max-w-md">
-          <motion.button
-            whileTap={{ scale: 0.96 }}
-            onClick={() => setShowLocationFilter(true)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all ${
-              locationFilter.city
-                ? "bg-white text-black border-white"
-                : "bg-white/5 border-white/15 text-muted-foreground hover:bg-white/10 hover:text-foreground"
-            }`}
-          >
-            <MapPin className="h-3.5 w-3.5 shrink-0" />
-            <span>
-              {locationFilter.city
-                ? `${locationFilter.city}${locationFilter.radius !== "Anywhere" ? ` · ${locationFilter.radius}` : ""}`
-                : "Anywhere"}
-            </span>
-            <SlidersHorizontal className="h-3.5 w-3.5 shrink-0 opacity-60" />
-          </motion.button>
-          {locationFilter.city && (
-            <motion.button
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              onClick={() => setLocationFilter({ city: "", radius: "Anywhere" })}
-              className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-            >
-              <X className="h-3.5 w-3.5" />
-            </motion.button>
-          )}
-          {locationFilter.city && (
-            <span className="ml-auto text-xs text-muted-foreground">
-              {cards.length} {cards.length === 1 ? "result" : "results"}
-            </span>
-          )}
-        </div>
+        {/* Filter pill */}
+        {(() => {
+          const activeCount = [
+            filters.city,
+            filters.experience !== "Any" && "x",
+            filters.workStyle !== "Any" && "x",
+            filters.industry !== "Any" && "x",
+          ].filter(Boolean).length;
+          return (
+            <div className="flex items-center gap-2 mb-4 w-full max-w-md">
+              <motion.button
+                whileTap={{ scale: 0.96 }}
+                onClick={() => setShowFilters(true)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all ${
+                  activeCount > 0
+                    ? "bg-white text-black border-white"
+                    : "bg-white/5 border-white/15 text-muted-foreground hover:bg-white/10 hover:text-foreground"
+                }`}
+              >
+                <SlidersHorizontal className="h-3.5 w-3.5 shrink-0" />
+                <span>Filters{activeCount > 0 ? ` · ${activeCount}` : ""}</span>
+              </motion.button>
+              {activeCount > 0 && (
+                <>
+                  <motion.button
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    onClick={() => setFilters(DEFAULT_FILTERS)}
+                    className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </motion.button>
+                  <span className="ml-auto text-xs text-muted-foreground">
+                    {cards.length} {cards.length === 1 ? "result" : "results"}
+                  </span>
+                </>
+              )}
+            </div>
+          );
+        })()}
 
         <div className="relative w-full max-w-md h-[70vh] md:h-[600px]">
           {cards[currentIndex + 1] && (
