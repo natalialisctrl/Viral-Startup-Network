@@ -33,7 +33,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     { icon: Layers, label: "Discover", href: "/swipe" },
     { icon: MessageSquare, label: "Matches", href: "/matches" },
     { icon: PlaySquare, label: "Feed", href: "/feed" },
-    { icon: UserCircle, label: "Profile", href: user?.userType === 'talent' ? `/talent/${user?.id}` : `/startup/${user?.id}` },
+    { icon: UserCircle, label: "Profile", href: "/my-profile" },
   ];
 
   return (

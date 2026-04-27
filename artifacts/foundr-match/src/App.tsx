@@ -19,6 +19,7 @@ import EquityCalculator from "@/pages/equity-calculator";
 import Premium from "@/pages/premium";
 import Settings from "@/pages/settings";
 import Admin from "@/pages/admin";
+import MyProfile from "@/pages/my-profile";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -51,6 +52,7 @@ function App() {
               <Route path="/equity-calculator" component={EquityCalculator} />
               <Route path="/premium" component={Premium} />
               <Route path="/settings" component={Settings} />
+              <Route path="/my-profile" component={MyProfile} />
               <Route path="/admin" component={Admin} />
               <Route component={NotFound} />
             </Switch>
