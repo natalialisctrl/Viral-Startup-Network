@@ -3,7 +3,8 @@ import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useLoginUser, useGetMe } from "@workspace/api-client-react";
+import { useLoginUser } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -32,6 +33,31 @@ export default function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const loginUser = useLoginUser();
+  const queryClient = useQueryClient();
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
+
+  async function handleDemoLogin() {
+    setIsDemoLoading(true);
+    try {
+      const res = await fetch("/api/users/demo", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!res.ok) {
+        throw new Error("Demo login failed");
+      }
+      await queryClient.invalidateQueries({ queryKey: ["getMe"] });
+      setLocation("/swipe");
+    } catch {
+      toast({
+        variant: "destructive",
+        title: "Demo unavailable",
+        description: "Could not start demo session. Please try again.",
+      });
+    } finally {
+      setIsDemoLoading(false);
+    }
+  }
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -159,6 +185,22 @@ export default function Login() {
             </Button>
           </form>
         </Form>
+
+        <div className="relative flex items-center gap-3">
+          <div className="flex-1 border-t border-border/50" />
+          <span className="text-xs text-muted-foreground uppercase tracking-wider">or</span>
+          <div className="flex-1 border-t border-border/50" />
+        </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full h-12 rounded-xl text-base font-semibold border-border/50 bg-background/50 hover:bg-primary/5 hover:border-primary/40 transition-all"
+          onClick={handleDemoLogin}
+          disabled={isDemoLoading || loginUser.isPending}
+        >
+          {isDemoLoading ? "Loading demo..." : "✨ Try Demo"}
+        </Button>
 
         <div className="text-center text-sm">
           <span className="text-muted-foreground">Don't have an account? </span>
