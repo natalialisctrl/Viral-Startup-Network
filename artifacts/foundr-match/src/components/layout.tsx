@@ -14,6 +14,7 @@ import {
   X
 } from "lucide-react";
 import { useLogoutUser, useGetMyStats, useListNotifications } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
@@ -21,10 +22,18 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const [, setLocation] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const logout = useLogoutUser();
+  const queryClient = useQueryClient();
 
   const handleLogout = () => {
     logout.mutate(undefined, {
-      onSuccess: () => setLocation("/")
+      onSuccess: () => {
+        queryClient.clear();
+        setLocation("/login");
+      },
+      onError: () => {
+        queryClient.clear();
+        setLocation("/login");
+      },
     });
   };
 
@@ -112,7 +121,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Mobile Bottom Nav */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 border-t border-border/40 bg-background/80 backdrop-blur-xl pb-safe z-50 flex items-center justify-around p-2">
-        {navItems.slice(0, 4).map((item) => {
+        {navItems.map((item) => {
           const Icon = item.icon;
           return (
             <Link key={item.href} href={item.href}>
@@ -123,6 +132,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </Link>
           );
         })}
+        <button
+          onClick={handleLogout}
+          className="flex flex-col items-center justify-center p-2 text-destructive/70 hover:text-destructive transition-colors"
+        >
+          <LogOut className="h-6 w-6" />
+          <span className="text-[10px] mt-1 font-medium">Log out</span>
+        </button>
       </nav>
     </div>
   );
