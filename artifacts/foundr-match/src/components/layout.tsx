@@ -41,10 +41,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Mobile Header */}
       <header className="md:hidden flex items-center justify-between p-4 border-b border-border/40 bg-background/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold">
-            FM
-          </div>
-          <span className="text-xl font-bold tracking-tight">FoundrMatch</span>
+          <img src="/mesh-logo.png" alt="Mesh" className="h-8 w-8 rounded-lg object-cover" />
+          <span className="text-xl font-bold tracking-tight">Mesh</span>
         </div>
         <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
           {mobileMenuOpen ? <X /> : <Menu />}
@@ -64,10 +62,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             `}
           >
             <div className="p-6 hidden md:flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold">
-                FM
-              </div>
-              <span className="text-xl font-bold tracking-tight">FoundrMatch</span>
+              <img src="/mesh-logo.png" alt="Mesh" className="h-8 w-8 rounded-lg object-cover" />
+              <span className="text-xl font-bold tracking-tight">Mesh</span>
             </div>
 
             <nav className="flex-1 px-4 py-6 md:py-0 space-y-2">

@@ -47,7 +47,7 @@ export default function Register() {
         onSuccess: () => {
           toast({
             title: "Account created",
-            description: "Welcome to FoundrMatch.",
+            description: "Welcome to Mesh.",
           });
           setLocation("/onboarding");
         },

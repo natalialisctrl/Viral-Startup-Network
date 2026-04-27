@@ -10,10 +10,8 @@ export default function Landing() {
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl">
         <div className="container flex h-16 max-w-screen-2xl items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold">
-              FM
-            </div>
-            <span className="text-xl font-bold tracking-tight">FoundrMatch</span>
+            <img src="/mesh-logo.png" alt="Mesh" className="h-8 w-8 rounded-lg object-cover" />
+            <span className="text-xl font-bold tracking-tight">Mesh</span>
           </div>
           <nav className="flex items-center gap-4">
             <Link href="/login" className="text-sm font-medium hover:text-primary transition-colors">
@@ -48,12 +46,12 @@ export default function Landing() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6 bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/70"
+              className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6"
             >
-              One swipe could
+              Your network,
               <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">
-                change my life.
+                accelerated.
               </span>
             </motion.h1>
 
@@ -63,8 +61,8 @@ export default function Landing() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="mx-auto max-w-[600px] text-lg md:text-xl text-muted-foreground mb-10"
             >
-              Stop applying to jobs. Start matching with founders. 
-              FoundrMatch connects ambitious talent with high-growth startups through AI-powered compatibility.
+              Stop applying to jobs. Start matching with founders.
+              Mesh connects ambitious talent with high-growth startups through AI-powered compatibility.
             </motion.p>
 
             <motion.div
@@ -109,7 +107,7 @@ export default function Landing() {
       
       <footer className="border-t border-border/40 py-12 bg-card/20">
         <div className="container text-center text-muted-foreground">
-          <p>© 2025 FoundrMatch. All rights reserved.</p>
+          <p>© 2025 Mesh. All rights reserved.</p>
         </div>
       </footer>
     </div>

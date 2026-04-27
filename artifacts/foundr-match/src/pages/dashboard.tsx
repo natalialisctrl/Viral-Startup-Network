@@ -51,7 +51,7 @@ export default function Dashboard() {
   const streakCount = (stats as any)?.streakCount ?? 0;
 
   const shareMatch = () => {
-    const text = "I just matched with a startup on FoundrMatch 🚀 The future of hiring is here.";
+    const text = "I just matched with a startup on Mesh 🚀 Your network, accelerated.";
     if (navigator.share) {
       navigator.share({ text, url: window.location.origin }).catch(() => {});
     } else {

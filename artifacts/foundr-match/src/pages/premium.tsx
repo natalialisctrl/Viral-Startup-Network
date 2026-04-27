@@ -76,7 +76,7 @@ export default function Premium() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-              Unlock the full power of <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">FoundrMatch</span>
+              Unlock the full power of <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">Mesh</span>
             </h1>
             <p className="text-xl text-muted-foreground">
               Stop waiting. Start matching with the top 1% of the startup ecosystem.
