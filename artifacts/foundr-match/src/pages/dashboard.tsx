@@ -218,8 +218,14 @@ export default function Dashboard() {
         {/* Boost CTA + Share */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="p-6 rounded-2xl bg-gradient-to-r from-primary/20 to-white/5 border border-primary/30">
-            <h2 className="text-lg font-bold mb-1">Boost your visibility</h2>
-            <p className="text-muted-foreground text-sm mb-4">Upgrade to Premium for 5× more views and unlimited swipes.</p>
+            <h2 className="text-lg font-bold mb-1">
+              {isTalent ? "Boost your visibility" : "Find talent faster"}
+            </h2>
+            <p className="text-muted-foreground text-sm mb-4">
+              {isTalent
+                ? "Upgrade to Premium for 5× more views and unlimited swipes."
+                : "Upgrade to Premium to unlock candidate outreach and advanced filters."}
+            </p>
             <button className="bg-primary text-primary-foreground px-5 py-2 rounded-xl text-sm font-semibold shadow-[0_0_15px_rgba(255,255,255,0.08)] hover:shadow-[0_0_25px_rgba(255,255,255,0.15)] transition-all">
               View Plans
             </button>
@@ -227,7 +233,11 @@ export default function Dashboard() {
           <div className="p-6 rounded-2xl bg-card border border-border/50 flex flex-col justify-between">
             <div>
               <h2 className="text-lg font-bold mb-1">Spread the word</h2>
-              <p className="text-muted-foreground text-sm mb-4">Tell the world you matched with an elite startup.</p>
+              <p className="text-muted-foreground text-sm mb-4">
+                {isTalent
+                  ? "Tell the world you matched with an elite startup."
+                  : "Tell the world you found exceptional talent on Mesh."}
+              </p>
             </div>
             <button
               onClick={shareMatch}
