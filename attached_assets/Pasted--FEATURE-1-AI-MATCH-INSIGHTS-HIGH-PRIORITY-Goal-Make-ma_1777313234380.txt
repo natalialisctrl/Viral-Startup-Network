@@ -1,0 +1,207 @@
+🔥 FEATURE 1 — AI MATCH INSIGHTS (HIGH PRIORITY)
+Goal:
+
+Make matches feel intelligent and personalized.
+
+Implementation:
+
+Create:
+
+/lib/ai-insights.ts
+
+Function:
+
+Input: two profiles (talent + founder/startup)
+Use OpenAI API
+Output:
+match_score (0–100)
+strengths (2 bullet points)
+risk (1 bullet point)
+conversation_starter (1 sentence)
+UI Changes:
+On Swipe Cards:
+Add small badge:
+👉 “87% Match”
+On Match Modal:
+
+When a match occurs, show:
+
+Match %
+“Why you match”
+“Potential challenge”
+“Try saying this: …”
+🎬 FEATURE 2 — MATCH EXPERIENCE UPGRADE
+Goal:
+
+Make matching feel like a major event.
+
+Implementation:
+
+Update existing match trigger:
+
+Add full-screen modal using Framer Motion
+Animate:
+fade + scale
+slight bounce
+Content:
+“This could change everything.”
+
+Then display:
+
+Profile images
+Match %
+AI insights (from Feature 1)
+
+Add CTA buttons:
+
+“Start Chat”
+“View Profile”
+👀 FEATURE 3 — PROFILE VIEW TRACKING
+Goal:
+
+Increase dopamine + return usage
+
+Backend:
+
+Ensure table exists:
+
+profile_views
+- id
+- viewer_id
+- viewed_id
+- created_at
+Logic:
+Every time a profile card is opened or viewed → insert row
+Dashboard अपडेट:
+
+Add section:
+👉 “Who’s checking you out”
+
+Show:
+
+Count of views (last 24h)
+Optional: last 3 viewers
+🎮 FEATURE 4 — DAILY STREAK SYSTEM
+Goal:
+
+Drive daily engagement
+
+Backend:
+
+Update stats table:
+
+last_active_date
+streak_count
+Logic:
+If user logs in or swipes:
+If yesterday active → streak +1
+Else → reset to 1
+UI:
+
+On dashboard:
+
+🔥 “3 Day Streak”
+Subtext:
+“Stay active to boost visibility”
+🎥 FEATURE 5 — SIMPLE VIDEO PROFILES
+Goal:
+
+Increase engagement + differentiation
+
+Implementation:
+Add field to profiles:
+video_url
+Use Supabase Storage for upload
+UI:
+On Swipe Card:
+If video exists:
+autoplay muted
+fallback to image
+On Profile Page:
+Show video prominently
+📈 FEATURE 6 — HEAT & MOMENTUM VISIBILITY
+Goal:
+
+Make app feel alive and competitive
+
+You already compute scores—now surface them more aggressively.
+
+UI Changes:
+On Cards:
+If heat_score > threshold:
+👉 “🔥 Trending”
+If high response:
+👉 “⚡ Fast Replies”
+📲 FEATURE 7 — SHAREABLE MATCH MOMENT
+Goal:
+
+Create viral loop
+
+On Match:
+
+Add button:
+👉 “Share this”
+
+Generate simple share card:
+
+“I just matched with a startup on FoundrMatch 🚀”
+
+Use:
+
+HTML → image OR styled modal screenshot
+🧠 FEATURE 8 — CAREER INSIGHTS (LIGHT VERSION)
+Goal:
+
+Differentiate with AI
+
+Implementation:
+
+Create:
+
+/lib/career-oracle.ts
+
+Input:
+
+user profile
+activity stats
+
+Output:
+
+2 insights
+2 suggested improvements
+UI:
+
+On dashboard:
+👉 “Your Career Insights”
+
+Example:
+
+“You’re attracting early-stage startups”
+“Adding a portfolio could increase matches by 40%”
+⚠️ RULES
+Do NOT refactor working features
+Keep all additions modular
+Use existing UI system (ShadCN)
+Keep performance lightweight
+Use Supabase for all persistence
+Use React Query for data fetching
+✅ SUCCESS CRITERIA
+
+After implementation, the app should feel:
+
+More intelligent (AI insights everywhere)
+More exciting (match animation)
+More addictive (streaks, views)
+More alive (heat indicators, video)
+🧨 PRIORITY ORDER
+
+Implement in this exact order:
+
+AI Match Insights
+Match Animation Upgrade
+Profile Views
+Streak System
+Video Profiles
+Heat Indicators
+Career Insights
+Share Feature

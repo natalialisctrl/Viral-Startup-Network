@@ -133,4 +133,51 @@ router.post("/ai/profile-optimize", async (req, res): Promise<void> => {
   });
 });
 
+router.get("/ai/career-insights", async (req, res): Promise<void> => {
+  const userId = (req as any).session?.userId;
+  if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+
+  const [talent] = await db.select().from(talentProfilesTable).where(eq(talentProfilesTable.id, userId));
+  const [startup] = await db.select().from(startupProfilesTable).where(eq(startupProfilesTable.userId, userId));
+  const profile = talent ?? startup;
+  const isTalent = !!talent;
+
+  if (isTalent) {
+    const skillCount = talent.skills?.length ?? 0;
+    const hasPortfolio = !!talent.portfolioUrl;
+    const hasVideo = !!(talent as any).videoUrl;
+    res.json({
+      insights: [
+        skillCount > 5
+          ? `Your ${skillCount}-skill stack puts you in the top 20% of profiles attracting Series A+ startups.`
+          : "Profiles with 6+ skills get 3× more right-swipes from founders.",
+        hasPortfolio
+          ? "Your portfolio link is boosting your credibility score significantly."
+          : "Adding a portfolio or GitHub could increase your match rate by 40%.",
+      ],
+      improvements: [
+        !talent.headline ? "Add a punchy headline — it's the first thing founders read." : "Consider quantifying impact in your headline.",
+        !talent.whyStartups ? "Tell founders WHY you want startup life. Passion is the #1 hiring signal." : "Your 'Why Startups' answer is a key differentiator — keep it sharp.",
+      ],
+    });
+  } else {
+    const hasMission = !!(startup as any)?.mission;
+    const heatScore = (startup as any)?.heatScore ?? 50;
+    res.json({
+      insights: [
+        heatScore > 70
+          ? "Your startup is trending — you're in the top 25% for founder engagement this week."
+          : "Startups with a clear mission statement attract 2× more quality applicants.",
+        hasMission
+          ? "Your mission resonates — talent matching your culture is swiping right."
+          : "Add equity details to unlock matches with high-performance equity-motivated talent.",
+      ],
+      improvements: [
+        "Founders who respond within 24h have a 3× higher match conversion rate.",
+        "Adding a short team intro video can 5× profile engagement.",
+      ],
+    });
+  }
+});
+
 export default router;

@@ -26,6 +26,7 @@ export const startupProfilesTable = pgTable("startup_profiles", {
   websiteUrl: text("website_url"),
   twitterUrl: text("twitter_url"),
   linkedinUrl: text("linkedin_url"),
+  videoUrl: text("video_url"),
   badges: text("badges").array().notNull().default([]),
   heatScore: integer("heat_score").notNull().default(50),
   isVerified: boolean("is_verified").notNull().default(false),

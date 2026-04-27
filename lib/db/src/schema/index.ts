@@ -8,3 +8,4 @@ export * from "./messages";
 export * from "./videos";
 export * from "./notifications";
 export * from "./subscriptions";
+export * from "./profile-views";

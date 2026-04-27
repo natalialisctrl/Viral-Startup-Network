@@ -1,10 +1,23 @@
 import { Router, type IRouter } from "express";
 import { db, swipesTable, matchesTable, talentProfilesTable, startupProfilesTable, usersTable, notificationsTable } from "@workspace/db";
 import { eq, and, sql } from "drizzle-orm";
+
 import {
   CreateSwipeBody,
   ListMySwipesQueryParams,
 } from "@workspace/api-zod";
+
+async function updateStreak(userId: number): Promise<void> {
+  try {
+    const today = new Date().toISOString().split("T")[0];
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+    const [user] = await db.select({ streakCount: usersTable.streakCount, lastActiveDate: usersTable.lastActiveDate }).from(usersTable).where(eq(usersTable.id, userId));
+    if (!user) return;
+    if (user.lastActiveDate === today) return;
+    const newStreak = user.lastActiveDate === yesterday ? (user.streakCount ?? 0) + 1 : 1;
+    await db.update(usersTable).set({ streakCount: newStreak, lastActiveDate: today }).where(eq(usersTable.id, userId));
+  } catch { /* non-critical */ }
+}
 
 const router: IRouter = Router();
 
@@ -35,6 +48,8 @@ router.post("/swipes", async (req, res): Promise<void> => {
     targetType,
     direction,
   }).returning();
+
+  updateStreak(userId);
 
   let matched = false;
   let matchId: number | null = null;

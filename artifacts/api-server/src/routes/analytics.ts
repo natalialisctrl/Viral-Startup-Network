@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
-import { db, usersTable, talentProfilesTable, startupProfilesTable, matchesTable, swipesTable, messagesTable, subscriptionsTable } from "@workspace/db";
-import { eq, and, sql } from "drizzle-orm";
+import { db, usersTable, talentProfilesTable, startupProfilesTable, matchesTable, swipesTable, messagesTable, subscriptionsTable, profileViewsTable } from "@workspace/db";
+import { eq, and, sql, gte } from "drizzle-orm";
 
 const router: IRouter = Router();
 
@@ -64,15 +64,29 @@ router.get("/analytics/my-stats", async (req, res): Promise<void> => {
 
   const [talent] = await db.select().from(talentProfilesTable).where(eq(talentProfilesTable.userId, userId));
   const [startup] = await db.select().from(startupProfilesTable).where(eq(startupProfilesTable.userId, userId));
+  const [userRow] = await db.select({ streakCount: usersTable.streakCount, lastActiveDate: usersTable.lastActiveDate }).from(usersTable).where(eq(usersTable.id, userId));
+
+  const myProfileId = talent?.id ?? startup?.id ?? null;
+  const myProfileType = talent ? "talent" : startup ? "startup" : null;
+  let profileViewsCount = 0;
+  if (myProfileId && myProfileType) {
+    const since7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const [{ cnt }] = await db.select({ cnt: sql<number>`count(*)::int` }).from(profileViewsTable).where(
+      and(eq(profileViewsTable.viewedId, myProfileId), eq(profileViewsTable.viewedType, myProfileType), gte(profileViewsTable.createdAt, since7d))
+    );
+    profileViewsCount = cnt;
+  }
 
   res.json({
     swipesSent,
     swipesReceived: Math.floor(swipesSent * 0.7),
     matches,
     messagesSent,
-    profileViews: swipesSent * 3,
+    profileViews: profileViewsCount,
     momentumScore: talent?.momentumScore ?? 50,
     heatScore: startup?.heatScore ?? 50,
+    streakCount: userRow?.streakCount ?? 0,
+    lastActiveDate: userRow?.lastActiveDate ?? null,
   });
 });
 

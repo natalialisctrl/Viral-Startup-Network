@@ -30,6 +30,7 @@ export const talentProfilesTable = pgTable("talent_profiles", {
   momentumScore: integer("momentum_score").notNull().default(50),
   profileStrength: integer("profile_strength").notNull().default(0),
   avatarUrl: text("avatar_url"),
+  videoUrl: text("video_url"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

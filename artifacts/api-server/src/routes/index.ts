@@ -12,6 +12,7 @@ import notificationsRouter from "./notifications";
 import subscriptionsRouter from "./subscriptions";
 import aiRouter from "./ai";
 import analyticsRouter from "./analytics";
+import profileViewsRouter from "./profile-views";
 
 const router: IRouter = Router();
 
@@ -28,5 +29,6 @@ router.use(notificationsRouter);
 router.use(subscriptionsRouter);
 router.use(aiRouter);
 router.use(analyticsRouter);
+router.use(profileViewsRouter);
 
 export default router;

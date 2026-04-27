@@ -63,11 +63,18 @@ When starting foundr-match, the mockup-sandbox will be stopped automatically.
 
 ### API Features
 - Session auth (bcrypt + express-session + connect-pg-simple)
-- Swipe matching with AI scoring (OpenAI integration with mock fallback)
+- Swipe matching with deterministic AI match scores (70-96% range, stable per pair)
+- Full-screen animated match modal with AI insights, challenges, and conversation starters
+- Heat indicators on swipe cards (🔥 Trending, ⚡ Fast Replies)
+- Video profile support (videoUrl on talent/startup profiles)
+- Profile view tracking (POST /profile-views, GET /profile-views/mine)
+- Streak system (streak_count + last_active_date on users, updated on each swipe)
+- Career/founder insights endpoint (GET /ai/career-insights, profile-aware)
+- Dashboard: streak widget, "who's checking you out", AI career insights, share button
 - Real-time-ready messaging
 - Video feed with likes
 - Stripe-ready subscription tiers
-- Analytics endpoints
+- Analytics endpoints (include profileViews count + streakCount)
 
 ### Known Configuration Notes
 - `lib/api-zod/src/index.ts` must ONLY export `./generated/api` (not api.schemas separately)
