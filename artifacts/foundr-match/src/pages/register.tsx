@@ -1,11 +1,10 @@
-import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRegisterUser } from "@workspace/api-client-react";
-import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { useDemoLogin } from "@/hooks/use-demo-login";
 import {
   Form,
   FormControl,
@@ -30,31 +29,7 @@ export default function Register() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const registerUser = useRegisterUser();
-  const queryClient = useQueryClient();
-  const [isDemoLoading, setIsDemoLoading] = useState(false);
-
-  async function handleDemoLogin() {
-    setIsDemoLoading(true);
-    try {
-      const res = await fetch("/api/users/demo", {
-        method: "POST",
-        credentials: "include",
-      });
-      if (!res.ok) {
-        throw new Error("Demo login failed");
-      }
-      await queryClient.invalidateQueries({ queryKey: ["getMe"] });
-      setLocation("/swipe");
-    } catch {
-      toast({
-        variant: "destructive",
-        title: "Demo unavailable",
-        description: "Could not start demo session. Please try again.",
-      });
-    } finally {
-      setIsDemoLoading(false);
-    }
-  }
+  const { handleDemoLogin, isDemoLoading } = useDemoLogin();
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),

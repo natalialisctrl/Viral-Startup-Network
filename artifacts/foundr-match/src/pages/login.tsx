@@ -1,10 +1,8 @@
-import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useLoginUser } from "@workspace/api-client-react";
-import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -17,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
+import { useDemoLogin } from "@/hooks/use-demo-login";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -33,31 +32,7 @@ export default function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const loginUser = useLoginUser();
-  const queryClient = useQueryClient();
-  const [isDemoLoading, setIsDemoLoading] = useState(false);
-
-  async function handleDemoLogin() {
-    setIsDemoLoading(true);
-    try {
-      const res = await fetch("/api/users/demo", {
-        method: "POST",
-        credentials: "include",
-      });
-      if (!res.ok) {
-        throw new Error("Demo login failed");
-      }
-      await queryClient.invalidateQueries({ queryKey: ["getMe"] });
-      setLocation("/swipe");
-    } catch {
-      toast({
-        variant: "destructive",
-        title: "Demo unavailable",
-        description: "Could not start demo session. Please try again.",
-      });
-    } finally {
-      setIsDemoLoading(false);
-    }
-  }
+  const { handleDemoLogin, isDemoLoading } = useDemoLogin();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
