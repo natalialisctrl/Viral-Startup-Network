@@ -56,7 +56,7 @@ export default function Matches() {
               Keep swiping to find your perfect {isTalent ? "startup" : "co-founder"}.
             </p>
             <Link href="/swipe">
-              <button className="bg-primary text-primary-foreground px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-all shadow-[0_0_20px_rgba(124,58,237,0.3)]">
+              <button className="bg-primary text-primary-foreground px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-all shadow-[0_0_20px_rgba(255,255,255,0.08)]">
                 Start Swiping
               </button>
             </Link>

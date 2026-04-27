@@ -145,7 +145,7 @@ export default function Swipe() {
                 </div>
                 <div className="flex flex-col items-center">
                   <div className="h-px w-8 bg-gradient-to-r from-transparent via-primary to-transparent mb-1" />
-                  <Badge className="bg-primary text-primary-foreground font-black text-lg px-3 py-1 shadow-[0_0_20px_rgba(124,58,237,0.6)]">
+                  <Badge className="bg-primary text-primary-foreground font-black text-lg px-3 py-1 shadow-[0_0_20px_rgba(255,255,255,0.18)]">
                     {matchModal.score}%
                   </Badge>
                   <div className="h-px w-8 bg-gradient-to-r from-transparent via-primary to-transparent mt-1" />
@@ -169,8 +169,8 @@ export default function Swipe() {
                       <p className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-1">Potential Challenge</p>
                       <p className="text-sm">⚠ {challenge}</p>
                     </div>
-                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-3">
-                      <p className="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-1">Try saying this</p>
+                    <div className="bg-white/5 border border-white/10 rounded-xl p-3">
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Try saying this</p>
                       <p className="text-sm italic">"{starter}"</p>
                     </div>
                   </motion.div>
@@ -181,7 +181,7 @@ export default function Swipe() {
                 <Button variant="outline" className="flex-1 h-12 rounded-xl" onClick={() => { setMatchModal(null); setLocation(`/talent/${matchModal?.card?.id}`); }}>
                   <User className="h-4 w-4 mr-2" />View Profile
                 </Button>
-                <Button className="flex-1 h-12 rounded-xl bg-primary shadow-[0_0_20px_rgba(124,58,237,0.4)]" onClick={() => { setMatchModal(null); setLocation(`/chat/${matchModal?.matchId}`); }}>
+                <Button className="flex-1 h-12 rounded-xl bg-primary shadow-[0_0_20px_rgba(255,255,255,0.12)]" onClick={() => { setMatchModal(null); setLocation(`/chat/${matchModal?.matchId}`); }}>
                   <MessageCircle className="h-4 w-4 mr-2" />Start Chat
                 </Button>
               </motion.div>
@@ -239,11 +239,11 @@ export default function Swipe() {
                 <Card className="w-full h-full overflow-hidden border-border/50 bg-card shadow-2xl relative">
                   {/* Badges */}
                   <div className="absolute top-4 right-4 z-10 flex flex-col gap-1.5 items-end">
-                    <Badge className="bg-primary text-primary-foreground font-black px-3 py-1 shadow-[0_0_15px_rgba(124,58,237,0.5)]">
+                    <Badge className="bg-primary text-primary-foreground font-black px-3 py-1 shadow-[0_0_15px_rgba(255,255,255,0.15)]">
                       {score}% Match
                     </Badge>
                     {isTrending && <Badge className="bg-orange-500/90 text-white font-semibold px-2 py-0.5 text-xs">🔥 Trending</Badge>}
-                    {isFastReply && <Badge className="bg-blue-500/90 text-white font-semibold px-2 py-0.5 text-xs">⚡ Fast Replies</Badge>}
+                    {isFastReply && <Badge className="bg-white/90 text-black font-semibold px-2 py-0.5 text-xs">⚡ Fast Replies</Badge>}
                   </div>
 
                   {/* Hero */}
@@ -255,7 +255,7 @@ export default function Swipe() {
                     <div className={`text-center relative z-10 ${videoUrl ? "bg-black/50 backdrop-blur-sm rounded-2xl p-4" : ""}`}>
                       {isTalent ? (
                         <>
-                          <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-primary/40 to-purple-500/40 mb-3 flex items-center justify-center text-3xl font-bold shadow-xl border border-primary/30">
+                          <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-white/15 to-white/5 mb-3 flex items-center justify-center text-3xl font-bold shadow-xl border border-primary/30">
                             {(currentCard as any).companyName?.charAt(0)}
                           </div>
                           <h2 className="text-2xl font-bold">{(currentCard as any).companyName}</h2>
@@ -263,7 +263,7 @@ export default function Swipe() {
                         </>
                       ) : (
                         <>
-                          <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-primary/40 to-purple-500/40 mb-3 flex items-center justify-center text-3xl font-bold shadow-xl border border-primary/30">
+                          <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-white/15 to-white/5 mb-3 flex items-center justify-center text-3xl font-bold shadow-xl border border-primary/30">
                             {(currentCard as any).fullName?.charAt(0)}
                           </div>
                           <h2 className="text-2xl font-bold">{(currentCard as any).fullName}</h2>
@@ -315,7 +315,7 @@ export default function Swipe() {
           </motion.div>
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
             <Button variant="outline" size="icon" onClick={() => handleSwipe("down")}
-              className="w-12 h-12 rounded-full border-border/50 text-muted-foreground hover:bg-blue-500/10 hover:text-blue-500 hover:border-blue-500/50 shadow-lg">
+              className="w-12 h-12 rounded-full border-border/50 text-muted-foreground hover:bg-white/10 hover:text-white hover:border-white/30 shadow-lg">
               <Bookmark className="h-5 w-5" />
             </Button>
           </motion.div>

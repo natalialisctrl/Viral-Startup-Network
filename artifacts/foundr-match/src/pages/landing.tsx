@@ -18,7 +18,7 @@ export default function Landing() {
               Log in
             </Link>
             <Link href="/register">
-              <Button className="rounded-full px-6 bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-[0_0_20px_rgba(124,58,237,0.3)] hover:shadow-[0_0_30px_rgba(124,58,237,0.5)]">
+              <Button className="rounded-full px-6 bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-[0_0_20px_rgba(255,255,255,0.08)] hover:shadow-[0_0_30px_rgba(255,255,255,0.15)]">
                 Join Waitlist
               </Button>
             </Link>
@@ -50,7 +50,7 @@ export default function Landing() {
             >
               Your network,
               <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-zinc-500">
                 accelerated.
               </span>
             </motion.h1>
@@ -72,7 +72,7 @@ export default function Landing() {
               className="flex flex-col sm:flex-row items-center justify-center gap-4"
             >
               <Link href="/register">
-                <Button size="lg" className="rounded-full px-8 h-14 text-lg font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-[0_0_30px_rgba(124,58,237,0.4)] hover:shadow-[0_0_50px_rgba(124,58,237,0.6)] w-full sm:w-auto">
+                <Button size="lg" className="rounded-full px-8 h-14 text-lg font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-[0_0_30px_rgba(255,255,255,0.12)] hover:shadow-[0_0_50px_rgba(255,255,255,0.18)] w-full sm:w-auto">
                   Find Your Match
                 </Button>
               </Link>

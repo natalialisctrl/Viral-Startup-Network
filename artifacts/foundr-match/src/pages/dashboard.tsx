@@ -128,8 +128,8 @@ export default function Dashboard() {
               delay: 0.3,
             },
             {
-              icon: <TrendingUp className="h-5 w-5 text-purple-500" />,
-              bg: "bg-purple-500/10",
+              icon: <TrendingUp className="h-5 w-5 text-foreground" />,
+              bg: "bg-white/8",
               label: "Swipes Made",
               value: stats?.swipesSent ?? 0,
               delay: 0.4,
@@ -188,16 +188,16 @@ export default function Dashboard() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
             <Card className="p-6 border-border/50 bg-card/50 backdrop-blur-sm">
               <div className="flex items-center gap-3 mb-5">
-                <div className="p-2 bg-violet-500/10 rounded-lg">
-                  <Brain className="h-5 w-5 text-violet-500" />
+                <div className="p-2 bg-white/5 rounded-lg">
+                  <Brain className="h-5 w-5 text-foreground" />
                 </div>
                 <h3 className="font-semibold">Your {isTalent ? "Career" : "Founder"} Insights</h3>
-                <Badge variant="outline" className="ml-auto text-xs border-violet-500/30 text-violet-400">AI</Badge>
+                <Badge variant="outline" className="ml-auto text-xs border-white/15 text-muted-foreground">AI</Badge>
               </div>
               <div className="space-y-3 mb-4">
                 {careerInsights.insights?.map((insight: string, i: number) => (
-                  <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-violet-500/5 border border-violet-500/10">
-                    <span className="text-violet-400 mt-0.5 shrink-0">💡</span>
+                  <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-white/5 border border-white/8">
+                    <span className="text-muted-foreground mt-0.5 shrink-0">💡</span>
                     <p className="text-sm">{insight}</p>
                   </div>
                 ))}
@@ -217,14 +217,14 @@ export default function Dashboard() {
 
         {/* Boost CTA + Share */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-6 rounded-2xl bg-gradient-to-r from-primary/20 to-blue-500/20 border border-primary/30">
+          <div className="p-6 rounded-2xl bg-gradient-to-r from-primary/20 to-white/5 border border-primary/30">
             <h2 className="text-lg font-bold mb-1">Boost your visibility</h2>
             <p className="text-muted-foreground text-sm mb-4">Upgrade to Premium for 5× more views and unlimited swipes.</p>
-            <button className="bg-primary text-primary-foreground px-5 py-2 rounded-xl text-sm font-semibold shadow-[0_0_15px_rgba(124,58,237,0.3)] hover:shadow-[0_0_25px_rgba(124,58,237,0.5)] transition-all">
+            <button className="bg-primary text-primary-foreground px-5 py-2 rounded-xl text-sm font-semibold shadow-[0_0_15px_rgba(255,255,255,0.08)] hover:shadow-[0_0_25px_rgba(255,255,255,0.15)] transition-all">
               View Plans
             </button>
           </div>
-          <div className="p-6 rounded-2xl bg-gradient-to-r from-green-500/10 to-cyan-500/10 border border-green-500/20 flex flex-col justify-between">
+          <div className="p-6 rounded-2xl bg-card border border-border/50 flex flex-col justify-between">
             <div>
               <h2 className="text-lg font-bold mb-1">Spread the word</h2>
               <p className="text-muted-foreground text-sm mb-4">Tell the world you matched with an elite startup.</p>

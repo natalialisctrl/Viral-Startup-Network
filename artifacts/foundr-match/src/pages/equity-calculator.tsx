@@ -144,11 +144,11 @@ export default function EquityCalculator() {
               key={expectedPayout}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
             >
-              <Card className="border-primary/30 bg-gradient-to-br from-primary/10 to-blue-500/5 shadow-2xl relative overflow-hidden">
+              <Card className="border-primary/30 bg-gradient-to-br from-primary/10 to-white/3 shadow-2xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-32 bg-primary/10 blur-[100px] rounded-full mix-blend-screen pointer-events-none" />
                 <CardContent className="p-8 sm:p-12 relative z-10 flex flex-col items-center justify-center text-center min-h-[300px]">
                   <p className="text-lg font-medium text-muted-foreground mb-4 uppercase tracking-widest">Expected Payout</p>
-                  <div className="text-6xl sm:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400 font-mono tracking-tighter">
+                  <div className="text-6xl sm:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-zinc-400 font-mono tracking-tighter">
                     {formatCurrency(expectedPayout)}
                   </div>
                   

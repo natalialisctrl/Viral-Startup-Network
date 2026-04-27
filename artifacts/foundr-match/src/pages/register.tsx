@@ -72,9 +72,7 @@ export default function Register() {
         className="w-full max-w-md space-y-8 relative z-10 bg-card/50 backdrop-blur-xl p-8 rounded-3xl border border-border/50 shadow-2xl"
       >
         <div className="text-center space-y-2">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold text-xl mb-6 shadow-[0_0_20px_rgba(124,58,237,0.5)]">
-            FM
-          </div>
+          <img src="/mesh-logo.png" alt="Mesh" className="mx-auto h-14 w-14 rounded-2xl object-cover mb-6 ring-1 ring-white/10" />
           <h2 className="text-3xl font-bold tracking-tight">Create an account</h2>
           <p className="text-muted-foreground">Join the elite startup network</p>
         </div>
@@ -167,7 +165,7 @@ export default function Register() {
             />
             <Button
               type="submit"
-              className="w-full h-12 rounded-xl text-lg font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-[0_0_20px_rgba(124,58,237,0.3)] hover:shadow-[0_0_30px_rgba(124,58,237,0.5)]"
+              className="w-full h-12 rounded-xl text-lg font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-[0_0_20px_rgba(255,255,255,0.08)] hover:shadow-[0_0_30px_rgba(255,255,255,0.15)]"
               disabled={registerUser.isPending}
             >
               {registerUser.isPending ? "Creating account..." : "Sign up"}

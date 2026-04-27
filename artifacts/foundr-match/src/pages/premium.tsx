@@ -76,7 +76,7 @@ export default function Premium() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-              Unlock the full power of <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">Mesh</span>
+              Unlock the full power of <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-zinc-500">Mesh</span>
             </h1>
             <p className="text-xl text-muted-foreground">
               Stop waiting. Start matching with the top 1% of the startup ecosystem.
@@ -94,7 +94,7 @@ export default function Premium() {
               >
                 {plan.popular && (
                   <div className="absolute -top-4 inset-x-0 flex justify-center z-10">
-                    <span className="bg-gradient-to-r from-primary to-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center shadow-lg">
+                    <span className="bg-gradient-to-r from-white to-zinc-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center shadow-lg">
                       <Sparkles className="w-3 h-3 mr-1" /> Most Popular
                     </span>
                   </div>
@@ -132,7 +132,7 @@ export default function Premium() {
                     <Button 
                       className={`w-full h-12 rounded-xl text-md font-bold ${
                         plan.popular 
-                          ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_20px_rgba(124,58,237,0.4)]' 
+                          ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_20px_rgba(255,255,255,0.12)]' 
                           : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
                       }`}
                       variant={plan.popular ? "default" : "secondary"}
