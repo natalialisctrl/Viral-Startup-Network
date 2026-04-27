@@ -58,6 +58,19 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </Button>
       </header>
 
+      {/* Mobile full-screen overlay when menu is open */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="md:hidden fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
       {/* Desktop Sidebar & Mobile Menu */}
       <AnimatePresence>
         {(mobileMenuOpen || typeof window !== 'undefined' && window.innerWidth >= 768) && (
@@ -66,8 +79,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -300, opacity: 0 }}
             className={`
-              fixed md:sticky top-0 left-0 z-40 h-[100dvh] w-64 border-r border-border/40 bg-card/50 backdrop-blur-xl flex flex-col
-              ${mobileMenuOpen ? 'block' : 'hidden md:flex'}
+              fixed md:sticky top-0 left-0 h-[100dvh] w-64 border-r border-border/40 bg-card backdrop-blur-xl flex flex-col
+              ${mobileMenuOpen ? 'z-[70]' : 'z-40 hidden md:flex'}
             `}
           >
             <div className="p-6 hidden md:flex items-center gap-2">
@@ -75,7 +88,15 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               <span className="text-xl font-bold tracking-tight">Mesh</span>
             </div>
 
-            <nav className="flex-1 px-4 py-6 md:py-0 space-y-2">
+            {/* Mobile menu header */}
+            <div className="md:hidden flex items-center justify-between p-4 border-b border-border/40">
+              <span className="text-lg font-bold">Menu</span>
+              <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)}>
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+
+            <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -92,7 +113,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               })}
             </nav>
 
-            <div className="p-4 border-t border-border/40 space-y-2">
+            <div className="p-4 border-t border-border/40 space-y-1">
               <Link href="/settings">
                 <span 
                   className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-accent/50 transition-colors text-muted-foreground hover:text-foreground cursor-pointer"
@@ -104,7 +125,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               </Link>
               <button 
                 onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-destructive/10 transition-colors text-destructive hover:text-destructive cursor-pointer"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-destructive/10 transition-colors text-destructive cursor-pointer"
               >
                 <LogOut className="h-5 w-5" />
                 <span className="font-medium">Log out</span>
