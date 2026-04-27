@@ -75,14 +75,28 @@ router.post("/users/login", async (req, res): Promise<void> => {
     return;
   }
 
-  (req.session as any).userId = user.id;
-  const { passwordHash: _, ...safeUser } = user;
-  res.json(safeUser);
+  req.session.regenerate((err) => {
+    if (err) {
+      res.status(500).json({ error: "Session error" });
+      return;
+    }
+    (req.session as any).userId = user.id;
+    req.session.save((saveErr) => {
+      if (saveErr) {
+        res.status(500).json({ error: "Session save error" });
+        return;
+      }
+      const { passwordHash: _, ...safeUser } = user;
+      res.json(safeUser);
+    });
+  });
 });
 
 router.post("/users/logout", async (req, res): Promise<void> => {
-  req.session.destroy(() => {});
-  res.sendStatus(204);
+  req.session.destroy((err) => {
+    res.clearCookie("connect.sid");
+    res.sendStatus(204);
+  });
 });
 
 const DEMO_TALENT_SEED = [

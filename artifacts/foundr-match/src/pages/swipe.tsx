@@ -524,8 +524,8 @@ export default function Swipe() {
   const createSwipe = useCreateSwipe();
   const isTalent = user?.userType === "talent";
 
-  const { data: talentData, isLoading: isLoadingTalent } = useListTalent({}, { query: { enabled: !isTalent, queryKey: ["listTalent"] } });
-  const { data: startupData, isLoading: isLoadingStartups } = useListStartups({}, { query: { enabled: isTalent, queryKey: ["listStartups"] } });
+  const { data: talentData, isLoading: isLoadingTalent, isError: isErrorTalent, refetch: refetchTalent } = useListTalent({}, { query: { enabled: !isTalent, queryKey: ["listTalent"] } });
+  const { data: startupData, isLoading: isLoadingStartups, isError: isErrorStartups, refetch: refetchStartups } = useListStartups({}, { query: { enabled: isTalent, queryKey: ["listStartups"] } });
   useGetMyTalentProfile({ query: { enabled: isTalent, queryKey: ["myTalentProfile"] } });
   useGetMyStartupProfile({ query: { enabled: !isTalent, queryKey: ["myStartupProfile"] } });
 
@@ -539,6 +539,8 @@ export default function Swipe() {
 
   const allCards = isTalent ? startupData?.profiles || [] : talentData?.profiles || [];
   const isLoading = isTalent ? isLoadingStartups : isLoadingTalent;
+  const isError = isTalent ? isErrorStartups : isErrorTalent;
+  const refetch = isTalent ? refetchStartups : refetchTalent;
   const myId = user?.id ?? 1;
 
   const cards = useMemo(() => {
@@ -604,6 +606,21 @@ export default function Swipe() {
     );
   }, [currentCard, isTalent, myId, createSwipe]);
 
+  if (isError) {
+    return (
+      <AppLayout>
+        <div className="h-[calc(100vh-80px)] flex flex-col items-center justify-center p-4 text-center">
+          <div className="w-20 h-20 rounded-full bg-destructive/10 border border-destructive/20 flex items-center justify-center mb-5">
+            <X className="h-8 w-8 text-destructive/60" />
+          </div>
+          <h2 className="text-xl font-bold mb-2">Couldn't load profiles</h2>
+          <p className="text-muted-foreground text-sm mb-6 max-w-xs">Something went wrong fetching profiles. Try again.</p>
+          <Button onClick={() => refetch()}>Try again</Button>
+        </div>
+      </AppLayout>
+    );
+  }
+
   if (isLoading) {
     return (
       <AppLayout>
@@ -637,7 +654,10 @@ export default function Swipe() {
           ) : (
             <>
               <h2 className="text-2xl font-bold mb-2">You're all caught up!</h2>
-              <p className="text-muted-foreground max-w-md">Check back later for more potential matches.</p>
+              <p className="text-muted-foreground max-w-md mb-6">You've seen all current {isTalent ? "startups" : "candidates"}. Explore them again or check back soon for new ones.</p>
+              <Button onClick={() => setCurrentIndex(0)}>
+                <Star className="h-4 w-4 mr-2" /> Explore again
+              </Button>
             </>
           )}
         </div>
