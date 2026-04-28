@@ -15,6 +15,44 @@ function getAiScore(cardId: number, myId: number): number {
   return 70 + (((cardId * 17 + myId * 13) * 7) % 26);
 }
 
+// ── Per-card gradient accent ───────────────────────────────────────────────────
+function getCardGradient(card: any, isTalent: boolean): string {
+  if (isTalent) {
+    const ind = (card.industry || "").toLowerCase();
+    if (ind.includes("ai") || ind.includes("ml") || ind.includes("llm") || ind.includes("neural"))
+      return "from-[#0d1527] via-[#08101e] to-black";
+    if (ind.includes("health") || ind.includes("bio"))
+      return "from-[#0a1a0e] via-[#07120a] to-black";
+    if (ind.includes("fintech") || ind.includes("finance") || ind.includes("legal"))
+      return "from-[#13092a] via-[#0d0619] to-black";
+    if (ind.includes("dev") || ind.includes("tool"))
+      return "from-[#071520] via-[#040d14] to-black";
+    if (ind.includes("creator") || ind.includes("media") || ind.includes("marketing"))
+      return "from-[#1a0d1a] via-[#110811] to-black";
+    if (ind.includes("edtech") || ind.includes("education"))
+      return "from-[#1a150a] via-[#120e07] to-black";
+    return "from-[#111] via-[#0a0a0a] to-black";
+  } else {
+    const skills = ((card.skills ?? []) as string[]).join(" ").toLowerCase();
+    const hl = (card.headline || "").toLowerCase();
+    if (skills.includes("python") || skills.includes("torch") || skills.includes("ml") || hl.includes("ml") || hl.includes("ai") || hl.includes("nlp"))
+      return "from-[#071520] via-[#040d14] to-black";
+    if (skills.includes("figma") || skills.includes("design") || hl.includes("design") || hl.includes("brand"))
+      return "from-[#150d2a] via-[#0d0818] to-black";
+    if (hl.includes("growth") || hl.includes("revenue") || hl.includes("marketing") || hl.includes("gtm"))
+      return "from-[#1a100a] via-[#120b05] to-black";
+    if (skills.includes("go") || skills.includes("rust") || skills.includes("kubernetes") || hl.includes("backend") || hl.includes("infra") || hl.includes("platform") || hl.includes("devops"))
+      return "from-[#0a1a0e] via-[#07120a] to-black";
+    if (hl.includes("security") || hl.includes("zero trust"))
+      return "from-[#1a0a0a] via-[#120505] to-black";
+    if (hl.includes("data") || hl.includes("analytics"))
+      return "from-[#07161a] via-[#040f12] to-black";
+    if (hl.includes("product") || hl.includes("pm"))
+      return "from-[#130d1a] via-[#0d0812] to-black";
+    return "from-[#0d1527] via-[#08101e] to-black";
+  }
+}
+
 function getDimensions(cardId: number, myId: number) {
   const b = cardId * 17 + myId * 13;
   return {
@@ -767,7 +805,7 @@ export default function Swipe() {
       </AnimatePresence>
 
       {/* ── Swipe Area ── */}
-      <div className="h-[calc(100vh-80px)] flex flex-col items-center justify-center p-4 overflow-hidden">
+      <div className="flex flex-col items-center px-3 pt-2 overflow-hidden" style={{ height: 'calc(100dvh - 64px)' }}>
 
         {/* Filter pill */}
         {(() => {
@@ -778,7 +816,7 @@ export default function Swipe() {
             filters.industry !== "Any" && "x",
           ].filter(Boolean).length;
           return (
-            <div className="flex items-center gap-2 mb-4 w-full max-w-md">
+            <div className="flex items-center gap-2 mb-2 w-full max-w-md shrink-0">
               <motion.button
                 whileTap={{ scale: 0.96 }}
                 onClick={() => setShowFilters(true)}
@@ -810,21 +848,22 @@ export default function Swipe() {
           );
         })()}
 
-        <div className="relative w-full max-w-md h-[70vh] md:h-[600px]">
+        {/* Card stack — flexible height */}
+        <div className="relative w-full max-w-md flex-1 min-h-0">
           {cards[currentIndex + 1] && (
-            <div className="absolute inset-2 rounded-2xl bg-card border border-border/20 opacity-30 scale-95" />
+            <div className="absolute inset-x-3 top-2 bottom-0 rounded-3xl border border-white/8 bg-white/3" />
           )}
 
           <AnimatePresence mode="popLayout">
             {currentCard && (
               <motion.div
                 key={currentCard.id}
-                initial={{ scale: 0.92, opacity: 0, y: 20 }}
+                initial={{ scale: 0.94, opacity: 0, y: 16 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ x: dragX > 0 ? 1200 : -1200, opacity: 0, rotate: dragX > 0 ? 20 : -20, transition: { duration: 0.25 } }}
+                exit={{ x: dragX > 0 ? 1400 : -1400, opacity: 0, rotate: dragX > 0 ? 22 : -22, transition: { duration: 0.22 } }}
                 drag="x"
                 dragConstraints={{ left: 0, right: 0 }}
-                dragElastic={0.8}
+                dragElastic={0.75}
                 onDragStart={() => { isDragging.current = true; }}
                 onDrag={(_, info) => setDragX(info.offset.x)}
                 onDragEnd={(_, { offset }) => {
@@ -836,122 +875,179 @@ export default function Swipe() {
                 onClick={() => {
                   if (!isDragging.current) setExpandedCard(currentCard);
                 }}
-                style={{ rotate: dragX * 0.04 }}
-                className="absolute inset-0 w-full h-full cursor-pointer"
+                style={{ rotate: dragX * 0.035 }}
+                className="absolute inset-0 w-full h-full cursor-pointer select-none"
               >
-                {/* Like/Nope overlays */}
-                <AnimatePresence>
-                  {dragX > 40 && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: Math.min(dragX / 130, 1) }}
-                      className="absolute top-6 left-6 z-20 border-4 border-green-400 text-green-400 rounded-xl px-3 py-1 font-black text-xl -rotate-12">
-                      LIKE 💚
-                    </motion.div>
+                {/* ── Card ── */}
+                <div className={`w-full h-full rounded-3xl overflow-hidden relative shadow-2xl bg-gradient-to-br ${getCardGradient(currentCard, isTalent)}`}>
+
+                  {/* Subtle radial highlight */}
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_15%,rgba(255,255,255,0.07),transparent_55%)] pointer-events-none" />
+
+                  {/* Video */}
+                  {videoUrl && (
+                    <video src={videoUrl} autoPlay muted loop playsInline
+                      className="absolute inset-0 w-full h-full object-cover opacity-50" />
                   )}
-                  {dragX < -40 && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: Math.min(-dragX / 130, 1) }}
-                      className="absolute top-6 right-6 z-20 border-4 border-red-400 text-red-400 rounded-xl px-3 py-1 font-black text-xl rotate-12">
-                      NOPE ✕
-                    </motion.div>
-                  )}
-                </AnimatePresence>
 
-                <Card className="w-full h-full overflow-hidden border-border/50 bg-card shadow-2xl relative select-none">
-                  {/* Badges */}
-                  <div className="absolute top-4 right-4 z-10 flex flex-col gap-1.5 items-end">
-                    <Badge className="bg-primary text-primary-foreground font-black px-3 py-1 shadow-[0_0_15px_rgba(255,255,255,0.15)]">
-                      {score}% Match
-                    </Badge>
-                    {isTrending && <Badge className="bg-orange-500/90 text-white font-semibold px-2 py-0.5 text-xs">🔥 Trending</Badge>}
-                    {isFastReply && <Badge className="bg-white/90 text-black font-semibold px-2 py-0.5 text-xs">⚡ Fast Replies</Badge>}
-                  </div>
-
-                  {/* "Tap for more" hint */}
-                  <div className="absolute top-4 left-4 z-10 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm rounded-full px-2.5 py-1">
-                    <User className="h-3 w-3 text-white/60" />
-                    <span className="text-[10px] text-white/60 font-medium">tap to explore</span>
-                  </div>
-
-                  {/* Hero */}
-                  <div className="h-1/2 bg-gradient-to-b from-white/10 to-background flex items-center justify-center p-6 relative overflow-hidden">
-                    {videoUrl && (
-                      <video src={videoUrl} autoPlay muted loop playsInline
-                        className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                  {/* Like / Nope overlays */}
+                  <AnimatePresence>
+                    {dragX > 40 && (
+                      <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: Math.min(dragX / 110, 1), scale: 1 }}
+                        className="absolute top-8 left-6 z-20 border-[3px] border-emerald-400 text-emerald-400 rounded-2xl px-4 py-1.5 font-black text-xl -rotate-12 backdrop-blur-sm bg-emerald-400/5">
+                        LIKE 💚
+                      </motion.div>
                     )}
-                    <div className={`text-center relative z-10 ${videoUrl ? "bg-black/50 backdrop-blur-sm rounded-2xl p-4" : ""}`}>
-                      {isTalent ? (
-                        <>
-                          <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-white/15 to-white/5 mb-3 flex items-center justify-center text-3xl font-bold shadow-xl border border-white/20">
+                    {dragX < -40 && (
+                      <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: Math.min(-dragX / 110, 1), scale: 1 }}
+                        className="absolute top-8 right-6 z-20 border-[3px] border-red-400 text-red-400 rounded-2xl px-4 py-1.5 font-black text-xl rotate-12 backdrop-blur-sm bg-red-400/5">
+                        NOPE ✕
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Top-left: tap hint */}
+                  <div className="absolute top-4 left-4 z-10 flex items-center gap-1.5 bg-black/30 backdrop-blur-sm rounded-full px-2.5 py-1 border border-white/10">
+                    <User className="h-3 w-3 text-white/50" />
+                    <span className="text-[10px] text-white/50 font-medium">tap to explore</span>
+                  </div>
+
+                  {/* Top-right: badges */}
+                  <div className="absolute top-4 right-4 z-10 flex flex-col gap-1.5 items-end">
+                    <span className="bg-white text-black text-xs font-black px-3 py-1 rounded-full shadow-lg">
+                      {score}% Match
+                    </span>
+                    {isTrending && (
+                      <span className="bg-orange-500/90 text-white text-[11px] font-semibold px-2.5 py-0.5 rounded-full">🔥 Trending</span>
+                    )}
+                    {isFastReply && (
+                      <span className="bg-white/15 text-white text-[11px] font-semibold px-2.5 py-0.5 rounded-full border border-white/20">⚡ Fast Reply</span>
+                    )}
+                  </div>
+
+                  {/* Center: avatar / logo */}
+                  <div className="absolute inset-0 flex items-center justify-center" style={{ paddingBottom: '46%' }}>
+                    {isTalent ? (
+                      <div className="relative">
+                        {(currentCard as any).logoUrl ? (
+                          <img src={(currentCard as any).logoUrl} alt="" className="w-24 h-24 rounded-2xl object-cover border-2 border-white/20 shadow-2xl" />
+                        ) : (
+                          <div className="w-24 h-24 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-4xl font-black text-white/90 shadow-2xl backdrop-blur-sm">
                             {(currentCard as any).companyName?.charAt(0)}
                           </div>
-                          <h2 className="text-2xl font-bold">{(currentCard as any).companyName}</h2>
-                          <p className="text-muted-foreground font-medium text-sm mt-1">{(currentCard as any).industry || "Startup"} · {(currentCard as any).stage || "Early"}</p>
-                        </>
-                      ) : (
-                        <>
-                          <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-white/15 to-white/5 mb-3 flex items-center justify-center text-3xl font-bold shadow-xl border border-white/20">
+                        )}
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        {(currentCard as any).avatarUrl ? (
+                          <img
+                            src={(currentCard as any).avatarUrl}
+                            alt=""
+                            className="w-28 h-28 rounded-full object-cover border-[3px] border-white/25 shadow-2xl"
+                          />
+                        ) : (
+                          <div className="w-28 h-28 rounded-full bg-white/10 border-[3px] border-white/20 flex items-center justify-center text-5xl font-black text-white/90 shadow-2xl">
                             {(currentCard as any).fullName?.charAt(0)}
                           </div>
-                          <h2 className="text-2xl font-bold">{(currentCard as any).fullName}</h2>
-                          <p className="text-muted-foreground font-medium text-sm mt-1">{(currentCard as any).headline}</p>
-                        </>
-                      )}
-                    </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
-                  {/* Body */}
-                  <div className="p-5 h-1/2 flex flex-col justify-between">
-                    <div className="space-y-3">
-                      <p className="text-muted-foreground text-sm line-clamp-2">
-                        {isTalent
-                          ? (currentCard as any).elevatorPitch ?? (currentCard as any).mission
-                          : (currentCard as any).bio ?? (currentCard as any).whyStartups}
-                      </p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {(isTalent
-                          ? ((currentCard as any).badges ?? []).slice(0, 4)
-                          : ((currentCard as any).skills ?? []).slice(0, 4)
-                        ).map((tag: string, i: number) => (
-                          <Badge key={i} variant="outline" className="bg-white/5 border-white/15 text-xs">{tag}</Badge>
-                        ))}
+                  {/* Bottom info overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/85 to-transparent pt-20 px-5 pb-5">
+                    {/* Name + meta */}
+                    <div className="flex items-end justify-between gap-2 mb-1.5">
+                      <div className="min-w-0 flex-1">
+                        <h2 className="text-[22px] font-bold text-white leading-tight truncate">
+                          {isTalent ? (currentCard as any).companyName : (currentCard as any).fullName}
+                        </h2>
+                        <p className="text-white/55 text-sm leading-snug mt-0.5 truncate">
+                          {isTalent
+                            ? `${(currentCard as any).industry || "Startup"} · ${(currentCard as any).stage || "Early"}`
+                            : (currentCard as any).headline}
+                        </p>
                       </div>
+                      {!isTalent && (currentCard as any).yearsExperience && (
+                        <span className="shrink-0 text-white/45 text-xs bg-white/8 border border-white/12 px-2.5 py-1 rounded-full">
+                          {(currentCard as any).yearsExperience}y exp
+                        </span>
+                      )}
+                      {isTalent && (currentCard as any).teamSize && (
+                        <span className="shrink-0 text-white/45 text-xs bg-white/8 border border-white/12 px-2.5 py-1 rounded-full flex items-center gap-1">
+                          <Users className="h-3 w-3" />{(currentCard as any).teamSize}
+                        </span>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2 py-2 px-3 rounded-xl bg-white/5 border border-white/10">
-                      <Zap className="h-3.5 w-3.5 text-foreground/60 shrink-0" />
-                      <p className="text-xs text-muted-foreground line-clamp-1">
+
+                    {/* Tags */}
+                    <div className="flex flex-wrap gap-1.5 mb-3">
+                      {(isTalent
+                        ? ((currentCard as any).badges ?? []).slice(0, 4)
+                        : ((currentCard as any).skills ?? []).slice(0, 4)
+                      ).map((tag: string, i: number) => (
+                        <span key={i} className="px-2.5 py-0.5 rounded-full bg-white/10 text-white/65 text-xs border border-white/12 backdrop-blur-sm">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* AI insight row */}
+                    <div className="flex items-center gap-2 bg-white/6 rounded-xl px-3 py-2 border border-white/10">
+                      <Zap className="h-3 w-3 text-white/35 shrink-0" />
+                      <p className="text-[11px] text-white/45 truncate">
                         {score > 87 ? "Exceptional culture & skill alignment detected"
                           : score > 82 ? "Strong alignment across key hiring signals"
                           : "Good compatibility on core requirements"}
                       </p>
                     </div>
                   </div>
-                </Card>
+
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
 
-        {/* Buttons */}
-        <div className="flex items-center justify-center gap-4 mt-6">
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-            <Button variant="outline" size="icon" onClick={() => handleSwipe("left")}
-              className="w-14 h-14 rounded-full border-border/50 text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 shadow-lg">
-              <X className="h-6 w-6" />
-            </Button>
-          </motion.div>
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-            <Button variant="outline" size="icon" onClick={() => handleSwipe("down")}
-              className="w-12 h-12 rounded-full border-border/50 text-muted-foreground hover:bg-white/10 hover:text-white hover:border-white/30 shadow-lg">
-              <Bookmark className="h-5 w-5" />
-            </Button>
-          </motion.div>
-          <motion.div whileHover={{ scale: 1.15 }} whileTap={{ scale: 0.9 }}>
-            <Button variant="outline" size="icon" onClick={() => handleSwipe("right")}
-              className="w-14 h-14 rounded-full border-primary/50 text-primary hover:bg-primary/10 hover:border-primary shadow-lg shadow-primary/20">
-              <Heart className="h-6 w-6 fill-current" />
-            </Button>
-          </motion.div>
+        {/* ── Action Buttons — always visible above bottom nav ── */}
+        <div className="flex items-center justify-center gap-4 pt-3 pb-[72px] md:pb-5 w-full max-w-md shrink-0">
+          {/* Pass */}
+          <motion.button
+            whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.88 }}
+            onClick={() => handleSwipe("left")}
+            className="flex flex-col items-center gap-1 group"
+          >
+            <div className="w-[60px] h-[60px] rounded-full bg-white/6 border-2 border-red-500/40 flex items-center justify-center shadow-lg group-hover:bg-red-500/10 group-hover:border-red-500/70 transition-all">
+              <X className="h-6 w-6 text-red-400" strokeWidth={2.5} />
+            </div>
+            <span className="text-[10px] text-white/30 font-medium">Pass</span>
+          </motion.button>
+
+          {/* Save */}
+          <motion.button
+            whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.88 }}
+            onClick={() => handleSwipe("down")}
+            className="flex flex-col items-center gap-1 group"
+          >
+            <div className="w-[48px] h-[48px] rounded-full bg-white/5 border border-white/20 flex items-center justify-center shadow-md group-hover:bg-white/10 group-hover:border-white/40 transition-all">
+              <Bookmark className="h-5 w-5 text-white/50" />
+            </div>
+            <span className="text-[10px] text-white/25 font-medium">Save</span>
+          </motion.button>
+
+          {/* Like */}
+          <motion.button
+            whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.88 }}
+            onClick={() => handleSwipe("right")}
+            className="flex flex-col items-center gap-1 group"
+          >
+            <div className="w-[60px] h-[60px] rounded-full bg-white border-2 border-white flex items-center justify-center shadow-xl shadow-white/15 group-hover:bg-white/90 transition-all">
+              <Heart className="h-6 w-6 text-black fill-current" strokeWidth={2} />
+            </div>
+            <span className="text-[10px] text-white/30 font-medium">Like</span>
+          </motion.button>
         </div>
-        <p className="text-xs text-muted-foreground mt-3 opacity-50">Drag to swipe · tap card to explore</p>
+
       </div>
     </AppLayout>
   );
