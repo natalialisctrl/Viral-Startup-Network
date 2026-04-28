@@ -274,15 +274,23 @@ export default function Landing() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 }}
-              className="mt-12 flex items-center justify-center gap-6 text-sm text-muted-foreground"
+              className="mt-10 flex flex-wrap items-center justify-center gap-2.5"
             >
               {[
-                { icon: Zap, text: "AI-powered compatibility matching" },
-                { icon: Shield, text: "Invite-only network" },
-                { icon: Star, text: "Built for the next generation of founders" },
-              ].map(({ icon: Icon, text }) => (
-                <span key={text} className="flex items-center gap-1.5">
-                  <Icon className="h-3.5 w-3.5 text-cyan-400/70" />
+                { icon: Zap,    text: "AI Matching",      color: "rgba(6,182,212,0.8)"  },
+                { icon: Shield, text: "Invite-Only",       color: "rgba(167,139,250,0.8)" },
+                { icon: Star,   text: "Next-Gen Founders", color: "rgba(52,211,153,0.8)"  },
+              ].map(({ icon: Icon, text, color }) => (
+                <span
+                  key={text}
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-white/70 tracking-wide"
+                  style={{
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.10)",
+                    backdropFilter: "blur(8px)",
+                  }}
+                >
+                  <Icon className="h-3 w-3 shrink-0" style={{ color }} />
                   {text}
                 </span>
               ))}
