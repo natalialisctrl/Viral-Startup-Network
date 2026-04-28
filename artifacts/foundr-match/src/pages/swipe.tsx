@@ -177,23 +177,32 @@ function MatchRing({ score }: { score: number }) {
   const r = 44;
   const circ = 2 * Math.PI * r;
   const dash = circ * (score / 100);
+  const gradId = `ring-grad-${score}`;
   return (
     <div className="relative w-28 h-28 flex items-center justify-center">
       <svg className="absolute inset-0 -rotate-90" width="112" height="112">
-        <circle cx="56" cy="56" r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
+        <defs>
+          <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#06b6d4" />
+            <stop offset="60%" stopColor="#3b82f6" />
+            <stop offset="100%" stopColor="#818cf8" />
+          </linearGradient>
+        </defs>
+        <circle cx="56" cy="56" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="8" />
         <motion.circle
           cx="56" cy="56" r={r} fill="none"
-          stroke="rgba(255,255,255,0.9)" strokeWidth="8"
+          stroke={`url(#${gradId})`} strokeWidth="8"
           strokeLinecap="round"
           strokeDasharray={circ}
+          style={{ filter: "drop-shadow(0 0 6px rgba(6,182,212,0.8)) drop-shadow(0 0 18px rgba(59,130,246,0.45))" }}
           initial={{ strokeDashoffset: circ }}
           animate={{ strokeDashoffset: circ - dash }}
           transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
         />
       </svg>
       <div className="flex flex-col items-center">
-        <span className="text-3xl font-black">{score}%</span>
-        <span className="text-[10px] text-muted-foreground uppercase tracking-widest">Match</span>
+        <span className="text-3xl font-black" style={{ textShadow: "0 0 22px rgba(6,182,212,0.65)", color: "#e0f2fe" }}>{score}%</span>
+        <span className="text-[10px] uppercase tracking-widest" style={{ color: "rgba(103,232,249,0.6)" }}>Match</span>
       </div>
     </div>
   );
@@ -204,12 +213,13 @@ function DimBar({ label, value, delay }: { label: string; value: number; delay: 
   return (
     <div className="space-y-1.5">
       <div className="flex justify-between items-center">
-        <span className="text-xs text-muted-foreground font-medium">{label}</span>
-        <span className="text-xs font-bold text-foreground">{value}%</span>
+        <span className="text-xs font-medium" style={{ color: "rgba(186,230,255,0.55)" }}>{label}</span>
+        <span className="text-xs font-bold" style={{ color: "rgba(103,232,249,0.85)" }}>{value}%</span>
       </div>
-      <div className="h-1.5 bg-white/8 rounded-full overflow-hidden">
+      <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
         <motion.div
-          className="h-full bg-white rounded-full"
+          className="h-full rounded-full"
+          style={{ background: "linear-gradient(90deg, #14b8a6 0%, #6366f1 80%, #8b5cf6 100%)", boxShadow: "0 0 8px rgba(99,102,241,0.5)" }}
           initial={{ width: 0 }}
           animate={{ width: `${value}%` }}
           transition={{ duration: 0.9, ease: "easeOut", delay }}
@@ -358,38 +368,67 @@ function ProfileSheet({
         exit={{ y: "100%" }}
         transition={{ type: "spring", stiffness: 300, damping: 32 }}
         onClick={e => e.stopPropagation()}
-        className="absolute bottom-0 left-0 right-0 bg-[#0d0d0d] rounded-t-[28px] border-t border-white/10 flex flex-col"
-        style={{ maxHeight: "92dvh" }}
+        className="absolute bottom-0 left-0 right-0 rounded-t-[28px] border-t border-white/10 flex flex-col overflow-hidden"
+        style={{ maxHeight: "92dvh", background: "#080808" }}
       >
+        {/* ── Animated ambient glow background ── */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" style={{ zIndex: 0 }}>
+          <motion.div
+            animate={{ x: [0, 40, -30, 0], y: [0, -30, 40, 0] }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            className="absolute top-1/4 left-1/2 w-[500px] h-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{ background: "radial-gradient(circle, rgba(88,28,135,0.14) 0%, transparent 70%)", filter: "blur(50px)" }}
+          />
+          <motion.div
+            animate={{ x: [0, -30, 20, 0], y: [0, 30, -20, 0] }}
+            transition={{ duration: 26, repeat: Infinity, ease: "linear" }}
+            className="absolute bottom-1/3 right-1/4 w-[400px] h-[400px] rounded-full"
+            style={{ background: "radial-gradient(circle, rgba(7,89,133,0.10) 0%, transparent 70%)", filter: "blur(50px)" }}
+          />
+        </div>
+
         {/* Drag handle */}
-        <div className="flex justify-center pt-3 pb-1 shrink-0">
+        <div className="flex justify-center pt-3 pb-1 shrink-0 relative" style={{ zIndex: 1 }}>
           <div className="w-10 h-1 rounded-full bg-white/20" />
         </div>
 
         {/* Close button */}
-        <button onClick={onClose} className="absolute top-4 right-4 p-2 rounded-full bg-white/8 hover:bg-white/14 transition-colors">
+        <button onClick={onClose} className="absolute top-4 right-4 p-2 rounded-full bg-white/8 hover:bg-white/14 transition-colors" style={{ zIndex: 2 }}>
           <ChevronDown className="h-5 w-5 text-muted-foreground" />
         </button>
 
         {/* Scrollable body */}
-        <div className="overflow-y-auto flex-1 px-6 pb-32 space-y-7 overscroll-contain">
+        <div className="overflow-y-auto flex-1 px-6 pb-32 space-y-7 overscroll-contain relative" style={{ zIndex: 1 }}>
 
           {/* ── Hero ── */}
           <div className="flex items-center gap-4 pt-2">
-            <div className={`relative w-16 h-16 shrink-0 ${isTalent ? "rounded-2xl" : "rounded-full"} bg-white/10 border border-white/15 flex items-center justify-center text-2xl font-black overflow-visible`}>
-              <span className={`${isTalent ? "avatar-gradient-ring-sq" : "avatar-gradient-ring"}`} />
-              {name?.charAt(0)}
+            {/* Avatar with gradient ring + subtle hex pattern bg */}
+            <div className="relative shrink-0 flex items-center justify-center" style={{ width: 68, height: 68 }}>
+              {/* Hex grid background */}
+              <div className="absolute inset-0 rounded-full overflow-hidden opacity-20"
+                style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='20' height='23' viewBox='0 0 20 23' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 0l10 5.8v11.4L10 23 0 17.2V5.8L10 0z' fill='none' stroke='%2306b6d4' stroke-width='0.5'/%3E%3C/svg%3E\")", backgroundSize: "20px 23px" }} />
+              <div className={`${isTalent ? "avatar-gradient-ring-sq" : "avatar-gradient-ring"}`}>
+                <div className={`bg-[#060606] ${isTalent ? "rounded-[13px]" : "rounded-full"} p-[2px]`}>
+                  <div className={`w-14 h-14 ${isTalent ? "rounded-2xl" : "rounded-full"} bg-white/10 flex items-center justify-center text-2xl font-black`}
+                    style={{ textShadow: "0 0 18px rgba(255,255,255,0.35)" }}>
+                    {name?.charAt(0)}
+                  </div>
+                </div>
+              </div>
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-xl font-black">{name}</h2>
+                <h2 className="text-2xl font-black tracking-tight"
+                  style={{ textShadow: "0 0 28px rgba(255,255,255,0.28)", color: "#f8fafc" }}>
+                  {name}
+                </h2>
                 {verifiedBadges.length > 0 && (
                   <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-cyan-500/12 border border-cyan-500/25 text-[10px] font-semibold text-cyan-400">
                     <Shield className="h-2.5 w-2.5" /> Verified
                   </span>
                 )}
               </div>
-              <p className="text-sm text-muted-foreground truncate">{sub}</p>
+              <p className="text-sm truncate mt-0.5" style={{ color: "rgba(167,139,250,0.75)" }}>{sub}</p>
               <div className="flex flex-wrap gap-1.5 mt-1.5">
                 <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-semibold ${archetype.cls}`}>
                   <Sparkles className="h-2.5 w-2.5" />{archetype.label}
@@ -428,9 +467,14 @@ function ProfileSheet({
           </div>
 
           {/* ── AI Match Analysis ── */}
-          <section className="space-y-3">
+          <motion.section className="space-y-3" initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.1 }} transition={{ duration: 0.4 }}>
             <h4 className="section-header-gradient">AI Match Analysis</h4>
-            <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-5">
+            {/* Glassmorphism card with animated pulsing border */}
+            <div className="ai-glow-card p-5 rounded-2xl space-y-5"
+              style={{
+                background: "linear-gradient(135deg, rgba(6,182,212,0.04), rgba(139,92,246,0.04))",
+                backdropFilter: "blur(12px)",
+              }}>
               <div className="flex items-center gap-5">
                 <MatchRing score={score} />
                 <div className="flex-1 space-y-3">
@@ -441,68 +485,74 @@ function ProfileSheet({
                 </div>
               </div>
               {/* 2-line AI reasoning */}
-              <div className="flex items-start gap-2.5 p-3 rounded-xl bg-cyan-500/6 border border-cyan-500/15">
+              <div className="flex items-start gap-2.5 p-3 rounded-xl"
+                style={{ background: "rgba(6,182,212,0.06)", border: "1px solid rgba(6,182,212,0.18)" }}>
                 <Sparkles className="h-3.5 w-3.5 text-cyan-400 shrink-0 mt-0.5" />
-                <p className="text-xs text-foreground/85 leading-relaxed">{reason}</p>
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(186,230,255,0.85)" }}>{reason}</p>
               </div>
               <div className="grid grid-cols-2 gap-2 pt-1">
                 {strengths.map((s, i) => (
-                  <div key={i} className="flex items-start gap-1.5 p-2.5 rounded-xl bg-green-500/8 border border-green-500/15 chip-shimmer">
-                    <CheckCircle2 className="h-3 w-3 text-green-400 mt-0.5 shrink-0" />
-                    <span className="text-xs text-foreground/80">{s}</span>
+                  <div key={i} className="flex items-start gap-1.5 p-2.5 rounded-xl chip-shimmer"
+                    style={{ background: "rgba(6,78,59,0.35)", border: "1px solid rgba(16,185,129,0.35)", boxShadow: "0 0 10px rgba(16,185,129,0.12) inset" }}>
+                    <CheckCircle2 className="h-3 w-3 text-emerald-400 mt-0.5 shrink-0" />
+                    <span className="text-xs text-emerald-100/80">{s}</span>
                   </div>
                 ))}
-                <div className="flex items-start gap-1.5 p-2.5 rounded-xl bg-amber-500/8 border border-amber-500/15 chip-shimmer">
+                <div className="flex items-start gap-1.5 p-2.5 rounded-xl chip-shimmer"
+                  style={{ background: "rgba(78,50,6,0.35)", border: "1px solid rgba(251,191,36,0.35)", boxShadow: "0 0 10px rgba(251,191,36,0.10) inset" }}>
                   <span className="text-amber-400 text-xs mt-0.5 shrink-0">⚠</span>
-                  <span className="text-xs text-foreground/80">{challenge}</span>
+                  <span className="text-xs text-amber-100/80">{challenge}</span>
                 </div>
               </div>
             </div>
-          </section>
+          </motion.section>
 
           {/* ── About ── */}
           {bio && (
-            <section className="space-y-2">
+            <motion.section className="space-y-2" initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.1 }} transition={{ duration: 0.4 }}>
               <h4 className="section-header-gradient">About</h4>
-              <p className="text-sm leading-[1.75] text-foreground/80">{bio}</p>
-            </section>
+              <p className="text-sm leading-[1.8]" style={{ color: "rgba(226,232,240,0.82)" }}>{bio}</p>
+            </motion.section>
           )}
 
           {/* ── Projects / Traction ── */}
-          {isTalent
-            ? <TractionCard profile={card} />
-            : <ProjectCard profile={card} />
-          }
+          <motion.div initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.1 }} transition={{ duration: 0.4 }}>
+            {isTalent
+              ? <TractionCard profile={card} />
+              : <ProjectCard profile={card} />
+            }
+          </motion.div>
 
           {/* ── All skills / badges ── */}
           {tags.length > 0 && (
-            <section className="space-y-2">
+            <motion.section className="space-y-2" initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.1 }} transition={{ duration: 0.4 }}>
               <h4 className="section-header-gradient">
                 {isTalent ? "Culture & Vibe" : "Superpowers"}
               </h4>
               <div className="flex flex-wrap gap-1.5">
                 {tags.map((t: string, i: number) => (
                   <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium border"
-                    style={{background:"linear-gradient(135deg,rgba(6,182,212,0.08),rgba(139,92,246,0.08))",borderColor:"rgba(6,182,212,0.22)",color:"rgba(224,242,254,0.85)"}}>
+                    style={{background:"linear-gradient(135deg,rgba(6,182,212,0.08),rgba(139,92,246,0.08))",borderColor:"rgba(6,182,212,0.22)",color:"rgba(224,242,254,0.85)",boxShadow:"0 0 6px rgba(6,182,212,0.08)"}}>
                     {t}
                   </span>
                 ))}
               </div>
-            </section>
+            </motion.section>
           )}
 
           {/* ── Why section ── */}
           {whyText && (
-            <section className="space-y-2">
+            <motion.section className="space-y-2" initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.1 }} transition={{ duration: 0.4 }}>
               <h4 className="section-header-gradient">{whyLabel}</h4>
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-sm text-foreground/80 italic leading-relaxed">
+              <div className="p-4 rounded-2xl text-sm italic leading-[1.75]"
+                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(226,232,240,0.75)" }}>
                 "{whyText}"
               </div>
-            </section>
+            </motion.section>
           )}
 
           {/* ── Stats row ── */}
-          <section className="space-y-2">
+          <motion.section className="space-y-2" initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.1 }} transition={{ duration: 0.4 }}>
             <h4 className="section-header-gradient">Details</h4>
             <div className="grid grid-cols-2 gap-2">
               {isTalent ? (
@@ -521,10 +571,10 @@ function ProfileSheet({
                 </>
               )}
             </div>
-          </section>
+          </motion.section>
 
           {/* ── Smart Intro Generator ── */}
-          <section className="space-y-2 pb-2">
+          <motion.section className="space-y-2 pb-2" initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.1 }} transition={{ duration: 0.4 }}>
             <div className="flex items-center justify-between">
               <h4 className="section-header-gradient">Smart Intro</h4>
               <span className="px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wide bg-gradient-to-r from-cyan-500/20 to-violet-500/20 border border-cyan-500/25 text-cyan-300">AI</span>
@@ -555,7 +605,7 @@ function ProfileSheet({
                 </button>
               </div>
             </div>
-          </section>
+          </motion.section>
 
         </div>
 

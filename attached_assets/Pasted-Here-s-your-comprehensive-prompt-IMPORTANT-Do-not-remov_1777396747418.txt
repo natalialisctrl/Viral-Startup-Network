@@ -1,0 +1,91 @@
+Here's your comprehensive prompt:
+
+
+IMPORTANT: Do not remove, break, or change any existing functionality, data, features, or layout structure. This is purely a visual and UI upgrade across every screen of the app.
+Please make the following upgrades across all screens:
+
+GLOBAL / APP-WIDE
+
+Apply a consistent glassmorphism card treatment across every screen — semi-transparent dark surfaces, 1px borders at ~10% white opacity, subtle inner glow
+Add a slow-moving animated radial gradient background across all pages — extremely dark, near-black, but with a deep violet or midnight blue glow that shifts slowly like a living environment
+Every screen must feel visually consistent — same design language, same glow system, same typography treatment throughout
+Add a splash/loading screen when the app first opens: the Mesh logo centered, with a soft animated pulse ring expanding outward, lasting about 2 seconds before transitioning in
+All section headers across the app should use wider letter-spacing, muted cyan coloring, and a thin gradient underline (cyan → transparent)
+All avatar rings across every screen should have the animated gradient ring treatment (cycling cyan → violet → electric blue)
+
+
+LANDING PAGE (/) — Complete Visual Overhaul
+
+Replace the static background with an animated particle network — dark background with slowly moving dots connected by faint glowing lines, representing connections forming in real time
+The hero headline "Your network, accelerated." should have a gradient text effect (white → cyan) with a subtle typewriter or fade-in animation on load
+The word "accelerated" specifically should glow in cyan/electric blue to draw the eye
+Add 2–3 floating, slightly blurred profile cards in the background of the hero section showing the product in action — they should drift slowly to suggest a live feed
+The "Find Your Match" CTA button should have the neon glow treatment — glowing border, gradient fill, subtle pulse animation
+The "Join Waitlist" button in the nav should match this treatment
+Stats at the bottom (2,500+ and 50k+) should animate counting upward when they scroll into view
+
+
+DISCOVER PAGE (/swipe) — Card Polish
+
+Glassmorphism card background with cyan-to-violet animated gradient border
+The 72% Match badge: glowing gradient border (cyan → violet), soft outer glow
+Trending badge: amber → orange gradient pill with orange glow
+Fast Reply badge: electric blue → cyan gradient pill with cyan glow
+Avatar: animated gradient ring cycling cyan → violet → blue
+Skill tags (React, TypeScript, etc.): dark teal-to-purple gradient fill with glowing cyan border
+Action buttons (Pass, Save, Like): neon glow on interaction — red glow for Pass, silver for Save, warm pulse for Like. Glassy dimensional surface.
+Compatibility bar at the bottom: continuous shimmer sweep animation
+Name typography: heavier weight with subtle white luminance glow
+Headline/subtitle: muted cyan or lavender instead of plain gray
+
+
+EXPANDED PROFILE VIEW — Detail Screen
+
+AI Match Analysis card: glassmorphism with animated cyan-to-violet gradient border that pulses slowly
+The circular match percentage dial: neon gradient arc (cyan → electric blue) with soft outer glow radiating outward
+Progress bars (Skills overlap, Culture fit, Growth potential, Working style): animate in from left on load, gradient fill (teal → purple), glowing leading edge
+Match insight chips: green chips get glowing emerald border with dark glass fill; amber chip gets glowing amber border — all chips get a subtle shimmer sweep
+Section headers: gradient underline, cyan letter-spacing treatment
+About and bio text: increase line height slightly for a premium editorial feel
+Scroll experience: fade-in-up animation as each section enters the viewport
+
+
+FEED / TALENT REELS (/feed)
+
+This screen needs the most attention — it currently appears visually empty
+Populate with demo/sample content cards if no real data exists yet — each card should show: avatar with animated ring, founder name, one-line startup pitch, skill tags, and a glowing Connect button
+Each card gets the full glassmorphism treatment
+Add a subtle "LIVE" indicator badge in the top corner of the feed to suggest real-time activity
+Section header "TALENT REELS" should get the cyan gradient underline and letter-spacing treatment
+Add a soft top-to-bottom gradient fade at the bottom of the screen to suggest more content below
+
+
+CONNECTIONS PAGE (/matches)
+
+Each connection row should become a full glassmorphism card — not a plain list row
+Add the animated avatar ring to every connection
+Below each person's title, add a one-line AI-generated reason the match was made (can be static demo text for now), styled in muted cyan italics
+The "NEW" badge should get a glowing electric blue treatment
+The "3 matches" counter pill should have a gradient border and soft glow
+Add a subtle hover/press state on each card — a soft glow expands on tap
+
+
+DASHBOARD (/dashboard)
+
+The "Your Founder Insights" AI section should be visually elevated to the hero of the dashboard — give it a glowing gradient border (cyan → violet), a pulsing "AI" badge in electric blue, and animate each insight card loading in sequentially
+The Heat Score number (92%) should use a large gradient text treatment (orange → amber) with a subtle glow, and the progress bar should animate filling on load
+The streak card (1 Day Streak) gets a warm amber/orange glassmorphism treatment with a flame glow effect
+Profile Views and Matches stat cards: give each a glassmorphism surface with a colored icon glow (blue for views, green for matches)
+The "Find talent faster" upgrade card: gradient border, more premium feel — this is a revenue touchpoint and should look valuable, not like a footnote
+Welcome text ("Welcome back, Alex"): larger, bolder, subtle white glow on the name
+"Here's your momentum today." subtext: muted cyan color
+
+
+NAVIGATION BAR (bottom)
+
+Active tab indicator should be a glowing cyan dot or underline, not a plain highlight
+Icons should have a soft glow when active
+The bar itself should have a glassmorphism treatment — frosted, slightly transparent, with a thin glowing top border
+
+
+Again — preserve every single existing feature, interaction, data point, and layout structure exactly as it is. These are purely visual enhancements layered on top of what already exists.
