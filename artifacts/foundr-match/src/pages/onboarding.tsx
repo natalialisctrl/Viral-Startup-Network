@@ -94,8 +94,15 @@ export default function Onboarding() {
               className="space-y-6"
             >
               <h2 className="text-3xl font-bold">What's your archetype?</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {["Builder", "Visionary", "Operator", "Craftsman", "Rainmaker"].map(type => (
+              <p className="text-muted-foreground text-sm -mt-2">Pick the one that fits you best — this shapes who you get matched with.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {[
+                  { type: "Builder",    emoji: "🔨", desc: "You ship fast and turn ideas into working products from scratch." },
+                  { type: "Visionary",  emoji: "🔭", desc: "You see the future others can't yet and inspire people to build toward it." },
+                  { type: "Operator",   emoji: "⚙️",  desc: "You turn chaos into process and make the engine run at scale." },
+                  { type: "Craftsman",  emoji: "🎯", desc: "You obsess over quality and produce deeply thoughtful, refined work." },
+                  { type: "Rainmaker",  emoji: "💰", desc: "You open doors, close deals, and turn relationships into revenue." },
+                ].map(({ type, emoji, desc }) => (
                   <div
                     key={type}
                     onClick={() => setPersonality(type)}
@@ -103,7 +110,11 @@ export default function Onboarding() {
                       personality === type ? "border-primary bg-primary/10" : "border-border hover:border-primary/50"
                     }`}
                   >
-                    <h3 className="font-bold">{type}</h3>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-lg">{emoji}</span>
+                      <h3 className="font-bold">{type}</h3>
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-snug">{desc}</p>
                   </div>
                 ))}
               </div>
