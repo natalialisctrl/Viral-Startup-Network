@@ -122,10 +122,12 @@ function getCompatibilityReason(card: any, isTalent: boolean, score: number): st
   const industry = isTalent ? (card.industry || "tech") : "";
   const stage = isTalent ? (card.stage || "early") : "";
   if (isTalent) {
-    if (score > 87) return `Both operating in ${industry} at ${stage} stage. Your founding vision pairs tightly with this team's execution velocity.`;
-    if (score > 81) return `Overlapping domain focus in ${industry} with complementary backgrounds. Strong potential for high-impact collaboration.`;
-    return `Adjacent problem spaces with compatible working styles. A conversation could unlock unexpected alignment.`;
+    // Talent user viewing a STARTUP card
+    if (score > 87) return `This team's mission in ${industry} aligns with your career goals. Stage preference and culture signals are an exceptional match.`;
+    if (score > 81) return `Their ${industry} focus at ${stage} stage maps well to your background. Strong potential for high-impact collaboration.`;
+    return `Compatible working styles with adjacent problem spaces. A conversation could unlock unexpected alignment.`;
   } else {
+    // Founder user viewing a TALENT card
     if (score > 87) return `Deep ${topSkill} expertise matches exactly what this startup needs now. Culture signals and stage preference are tightly aligned.`;
     if (score > 81) return `${topSkill} background directly maps to their open roles. Working style and ambition level suggest strong culture fit.`;
     return `Complementary skills and growth trajectory. Good baseline for a productive first conversation.`;
@@ -134,14 +136,15 @@ function getCompatibilityReason(card: any, isTalent: boolean, score: number): st
 
 // ── Smart intro message generator ─────────────────────────────────────────────
 function generateIntroMessage(myProfile: any | null, theirCard: any, isTalent: boolean): string {
-  const theirName = isTalent ? theirCard.companyName : theirCard.fullName?.split(" ")[0] || "there";
-  if (!isTalent) {
-    // talent messaging startup
-    const mySkill = (myProfile?.skills ?? [])[0] || "my background";
+  if (isTalent) {
+    // Talent user sending a message to a STARTUP
+    const theirName = theirCard.companyName || "there";
     const theirInd = theirCard.industry || "your space";
+    const mySkill = (myProfile?.skills ?? [])[0] || "my background";
     return `Hey ${theirName}! I came across what you're building in ${theirInd} and it really resonates. My background in ${mySkill} feels like a natural fit — I'd love to explore if there's an opportunity here. Would you be open to a quick 15-min call?`;
   } else {
-    // founder messaging talent
+    // Founder user sending a message to TALENT
+    const theirName = theirCard.fullName?.split(" ")[0] || "there";
     const theirSkill = (theirCard.skills ?? [])[0] || "your background";
     const myCompany = myProfile?.companyName || "our startup";
     return `Hi ${theirName}! Your ${theirSkill} experience caught my attention — at ${myCompany} we're tackling a problem I think you'd genuinely care about. I'd love to share more and hear your perspective. Worth a quick chat?`;

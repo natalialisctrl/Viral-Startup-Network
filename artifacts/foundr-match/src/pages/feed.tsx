@@ -2,272 +2,262 @@ import { useRef, useState, useEffect } from "react";
 import { AppLayout } from "@/components/layout";
 import { useAuth } from "@/context/AuthContext";
 import { useListVideos, useLikeVideo, useListTalent } from "@workspace/api-client-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Heart, Share2, MessageSquare, Bookmark, Info, Zap, MapPin, Briefcase, ExternalLink } from "lucide-react";
+import { Heart, Share2, MessageSquare, Bookmark, Info, Zap, MapPin, Briefcase, ExternalLink, Radio } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 
-// ── Talent Reel Card (shown to founders) ─────────────────────────────────────
-function TalentReelCard({
-  profile,
-  isActive,
-  index,
-}: {
-  profile: any;
-  isActive: boolean;
-  index: number;
-}) {
+const DEMO_TALENT = [
+  { id: 101, fullName: "Zara Kim", headline: "ML Engineer · ex-Google Brain", bio: "Building the next generation of AI-native developer tools. 3× startup founder, 8 years deep in distributed systems.", skills: ["PyTorch", "LLMs", "Python", "Go"], yearsExperience: 8, city: "San Francisco" },
+  { id: 102, fullName: "Marcus Tran", headline: "Full-Stack Builder · ex-Stripe", bio: "I live at the intersection of design and engineering. Shipped products used by 5M+ people. Looking for my next founding team.", skills: ["React", "TypeScript", "Node", "PostgreSQL"], yearsExperience: 6, city: "New York" },
+  { id: 103, fullName: "Priya Rao", headline: "Growth Lead · ex-Figma", bio: "Took Figma from 100k to 4M users. Growth is a science — I bring the experiments and the instincts.", skills: ["GTM", "SEO", "Mixpanel", "SQL"], yearsExperience: 5, city: "Remote" },
+  { id: 104, fullName: "Dev Patel", headline: "Platform Engineer · ex-Cloudflare", bio: "Built infra that serves 1T+ requests/day. Obsessed with zero-downtime and making ops boring in a good way.", skills: ["Kubernetes", "Rust", "Terraform", "Go"], yearsExperience: 7, city: "Austin" },
+  { id: 105, fullName: "Sam Lee", headline: "Product Thinker · ex-Linear", bio: "I believe great products are opinionated. Shipped 0→1 three times. Looking for a founder with a strong point of view.", skills: ["Product", "Figma", "SQL", "Python"], yearsExperience: 4, city: "Los Angeles" },
+];
+
+function TalentReelCard({ profile, isActive, index }: { profile: any; isActive: boolean; index: number }) {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [saved, setSaved] = useState(false);
 
   const gradients = [
-    "from-zinc-900 via-zinc-800 to-zinc-900",
-    "from-zinc-950 via-zinc-900 to-zinc-950",
-    "from-black via-zinc-900 to-black",
+    "from-[#07101a] via-[#04090e] to-black",
+    "from-[#120a1a] via-[#0a0612] to-black",
+    "from-[#0a1a0f] via-[#06100a] to-black",
+    "from-[#1a0f07] via-[#100905] to-black",
+    "from-[#0a0d1a] via-[#060812] to-black",
   ];
   const gradient = gradients[index % gradients.length];
-
   const skills: string[] = profile.skills ?? [];
-  const topSkills = skills.slice(0, 5);
+  const topSkills = skills.slice(0, 4);
 
   return (
-    <div className="h-full w-full snap-start relative flex flex-col bg-black border-b border-white/10 overflow-hidden">
-      {/* Background gradient */}
-      <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
+    <div className={`h-full w-full snap-start relative flex flex-col bg-gradient-to-br ${gradient} border-b border-white/[0.06] overflow-hidden`}>
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_80%,rgba(6,182,212,0.05),transparent_50%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_20%,rgba(124,58,237,0.05),transparent_50%)] pointer-events-none" />
 
-      {/* Subtle pattern overlay */}
-      <div className="absolute inset-0 opacity-5"
-        style={{ backgroundImage: "radial-gradient(circle at 20% 80%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)", backgroundSize: "60px 60px" }}
-      />
+      {/* LIVE + Reel badge */}
+      <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
+        <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase"
+          style={{ background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", color: "rgba(252,165,165,0.9)" }}>
+          <span className="w-1.5 h-1.5 rounded-full bg-red-400 live-dot" />
+          LIVE
+        </span>
+        <span className="text-[10px] font-bold text-white/35 uppercase tracking-widest">Talent Reel</span>
+      </div>
 
       {/* Content */}
       <div className="relative z-10 flex-1 flex flex-col justify-end p-4 pb-20 md:pb-6">
         <div className="flex items-end justify-between w-full gap-4">
           {/* Left: Profile info */}
           <div className="flex-1 space-y-3">
-            {/* Avatar + Name */}
             <div className="flex items-center gap-3">
-              <div className="relative">
-                <Avatar className="h-14 w-14 border-2 border-white/30">
-                  <AvatarImage src={profile.avatarUrl || undefined} />
-                  <AvatarFallback className="bg-white/10 text-white text-lg font-bold">
-                    {profile.fullName?.charAt(0) ?? "?"}
-                  </AvatarFallback>
-                </Avatar>
-                {isActive && (
-                  <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-black" />
-                )}
+              <div className="avatar-ring-sm shrink-0">
+                <div className="w-14 h-14 rounded-full bg-white/8 flex items-center justify-center text-2xl font-black text-white relative">
+                  {profile.fullName?.charAt(0) ?? "?"}
+                  {isActive && (
+                    <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-emerald-500 rounded-full border-2 border-black" />
+                  )}
+                </div>
               </div>
               <div>
-                <h3 className="font-bold text-white text-xl leading-tight">{profile.fullName}</h3>
-                <p className="text-white/70 text-sm">{profile.headline || "Startup Professional"}</p>
+                <h3 className="font-extrabold text-white text-xl leading-tight" style={{ textShadow: "0 0 16px rgba(255,255,255,0.2)" }}>
+                  {profile.fullName}
+                </h3>
+                <p style={{ color: "rgba(167,210,255,0.6)", fontSize: "0.8rem" }}>{profile.headline || "Startup Professional"}</p>
               </div>
             </div>
 
-            {/* Bio snippet */}
             {profile.bio && (
-              <p className="text-white/80 text-sm line-clamp-2 leading-relaxed">
-                {profile.bio}
-              </p>
+              <p className="text-white/75 text-sm line-clamp-2 leading-relaxed">{profile.bio}</p>
             )}
 
-            {/* Meta */}
-            <div className="flex flex-wrap items-center gap-3 text-xs text-white/60">
+            <div className="flex flex-wrap items-center gap-2.5 text-xs text-white/50">
               {profile.yearsExperience && (
-                <span className="flex items-center gap-1">
-                  <Briefcase className="h-3 w-3" />
-                  {profile.yearsExperience}y exp
-                </span>
+                <span className="flex items-center gap-1"><Briefcase className="h-3 w-3" />{profile.yearsExperience}y exp</span>
               )}
-              {profile.location && (
-                <span className="flex items-center gap-1">
-                  <MapPin className="h-3 w-3" />
-                  {profile.location}
-                </span>
-              )}
-              {profile.preferredWorkStyle && (
-                <Badge variant="outline" className="border-white/20 text-white/70 text-[10px] py-0 h-5">
-                  {profile.preferredWorkStyle}
-                </Badge>
+              {(profile.city || profile.location) && (
+                <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{profile.city || profile.location}</span>
               )}
             </div>
 
-            {/* Skills */}
             {topSkills.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {topSkills.map((skill, i) => (
-                  <span key={i} className="px-2.5 py-1 rounded-full bg-white/10 text-white text-xs font-medium border border-white/15">
+                  <span key={i} className="px-2.5 py-0.5 rounded-full text-xs font-medium chip-shimmer"
+                    style={{
+                      background: "linear-gradient(135deg,rgba(6,182,212,0.12),rgba(124,58,237,0.12))",
+                      border: "1px solid rgba(6,182,212,0.22)",
+                      color: "rgba(103,232,249,0.85)",
+                    }}>
                     {skill}
                   </span>
                 ))}
               </div>
             )}
 
-            {/* CTAs */}
             <div className="flex gap-2 pt-1">
-              <Button
-                size="sm"
-                className="bg-white text-black hover:bg-white/90 rounded-full font-semibold text-sm px-5"
+              <button
                 onClick={() => setLocation("/swipe")}
+                className="flex items-center gap-1.5 px-5 py-2 rounded-full text-sm font-bold bg-white text-black hover:bg-white/90 transition-all neon-cta"
               >
-                <Zap className="h-3.5 w-3.5 mr-1.5" /> Connect
-              </Button>
+                <Zap className="h-3.5 w-3.5" /> Connect
+              </button>
               {profile.portfolioUrl && (
                 <a href={profile.portfolioUrl} target="_blank" rel="noopener noreferrer">
-                  <Button size="sm" variant="outline" className="border-white/25 text-white hover:bg-white/10 rounded-full text-sm px-4">
-                    <ExternalLink className="h-3.5 w-3.5 mr-1.5" /> Portfolio
-                  </Button>
+                  <button className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm border border-white/20 text-white/80 hover:bg-white/10 transition-all">
+                    <ExternalLink className="h-3.5 w-3.5" /> Portfolio
+                  </button>
                 </a>
               )}
             </div>
           </div>
 
-          {/* Right: Action column */}
+          {/* Right: Actions */}
           <div className="flex flex-col items-center gap-5 pb-2">
             <button
               onClick={() => {
                 setSaved(!saved);
-                toast({ title: saved ? "Removed" : "Saved", description: saved ? "Removed from saved talent." : "Added to your saved talent." });
+                toast({ title: saved ? "Removed" : "Saved", description: saved ? "Removed from saved." : "Added to your saved talent." });
               }}
               className="flex flex-col items-center gap-1 group"
             >
-              <div className={`w-11 h-11 rounded-full backdrop-blur-md flex items-center justify-center border transition-colors ${saved ? "bg-white/20 border-white/40" : "bg-black/40 border-white/10 group-hover:bg-black/60"}`}>
-                <Bookmark className={`h-5 w-5 ${saved ? "text-white fill-white" : "text-white"}`} />
+              <div className={`w-11 h-11 rounded-full backdrop-blur-md flex items-center justify-center border transition-all ${saved ? "border-white/40" : "border-white/12 group-hover:border-white/25"}`}
+                style={{ background: saved ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.45)" }}>
+                <Bookmark className={`h-5 w-5 ${saved ? "text-white fill-white" : "text-white/70"}`} />
               </div>
-              <span className="text-white text-[10px] font-medium">Save</span>
+              <span className="text-white/50 text-[10px] font-medium">Save</span>
             </button>
 
             <button className="flex flex-col items-center gap-1 group">
-              <div className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/10 group-hover:bg-black/60 transition-colors">
-                <MessageSquare className="h-5 w-5 text-white" />
+              <div className="w-11 h-11 rounded-full backdrop-blur-md flex items-center justify-center border border-white/12 group-hover:border-white/25 transition-all"
+                style={{ background: "rgba(0,0,0,0.45)" }}>
+                <MessageSquare className="h-5 w-5 text-white/70" />
               </div>
-              <span className="text-white text-[10px] font-medium">Message</span>
+              <span className="text-white/50 text-[10px] font-medium">Message</span>
             </button>
 
             <button
               onClick={() => {
                 if (navigator.share) {
-                  navigator.share({ title: profile.fullName, text: `Check out ${profile.fullName} on Mesh — ${profile.headline}` }).catch(() => {});
+                  navigator.share({ title: profile.fullName, text: `Check out ${profile.fullName} on Mesh` }).catch(() => {});
                 } else {
                   navigator.clipboard.writeText(window.location.origin).then(() => toast({ title: "Link copied!" })).catch(() => {});
                 }
               }}
               className="flex flex-col items-center gap-1 group"
             >
-              <div className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/10 group-hover:bg-black/60 transition-colors">
-                <Share2 className="h-5 w-5 text-white" />
+              <div className="w-11 h-11 rounded-full backdrop-blur-md flex items-center justify-center border border-white/12 group-hover:border-white/25 transition-all"
+                style={{ background: "rgba(0,0,0,0.45)" }}>
+                <Share2 className="h-5 w-5 text-white/70" />
               </div>
-              <span className="text-white text-[10px] font-medium">Share</span>
+              <span className="text-white/50 text-[10px] font-medium">Share</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Top label */}
-      <div className="absolute top-4 left-4 z-10">
-        <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest">Talent Reel</span>
-      </div>
+      {/* Bottom fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
+        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.7), transparent)" }} />
     </div>
   );
 }
 
-// ── Startup Pitch Card (shown to talent) ──────────────────────────────────────
-function StartupPitchCard({
-  video,
-  isActive,
-  onLike,
-}: {
-  video: any;
-  isActive: boolean;
-  onLike: (id: number) => void;
-}) {
+function StartupPitchCard({ video, isActive, onLike }: { video: any; isActive: boolean; onLike: (id: number) => void }) {
   const [, setLocation] = useLocation();
 
   return (
-    <div className="h-full w-full snap-start relative flex items-center justify-center bg-zinc-900 border-b border-white/10">
-      {/* Background */}
-      <div className="absolute inset-0 bg-zinc-800">
+    <div className="h-full w-full snap-start relative flex items-center justify-center bg-black border-b border-white/[0.06]">
+      <div className="absolute inset-0">
         {video.thumbnailUrl ? (
-          <img src={video.thumbnailUrl} alt={video.title} className="w-full h-full object-cover opacity-60" />
+          <img src={video.thumbnailUrl} alt={video.title} className="w-full h-full object-cover opacity-55" />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-zinc-800 to-zinc-950 flex items-center justify-center">
-            <div className="w-20 h-20 rounded-full bg-black/50 flex items-center justify-center backdrop-blur-sm border border-white/20">
+          <div className="w-full h-full bg-gradient-to-br from-[#0d1527] to-black flex items-center justify-center">
+            <div className="w-20 h-20 rounded-full border border-white/20 flex items-center justify-center"
+              style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)" }}>
               <div className="w-0 h-0 border-t-[15px] border-t-transparent border-l-[25px] border-l-white border-b-[15px] border-b-transparent ml-2" />
             </div>
           </div>
         )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
       </div>
 
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent flex flex-col justify-end p-4 pb-20 md:pb-6">
+      {/* LIVE badge */}
+      <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
+        <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase"
+          style={{ background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", color: "rgba(252,165,165,0.9)" }}>
+          <span className="w-1.5 h-1.5 rounded-full bg-red-400 live-dot" />
+          LIVE
+        </span>
+        <span className="text-[10px] font-bold text-white/35 uppercase tracking-widest">Startup Pitch</span>
+      </div>
+
+      <div className="absolute inset-0 flex flex-col justify-end p-4 pb-20 md:pb-6 z-10">
         <div className="flex items-end justify-between w-full">
           <div className="flex-1 pr-14">
-            <div className="flex items-center gap-2 mb-2">
-              <Avatar className="h-10 w-10 border border-white/50">
-                <AvatarImage src={video.startupProfile?.logoUrl || undefined} />
-                <AvatarFallback className="bg-white/10 text-white text-xs font-bold">
+            <div className="flex items-center gap-2.5 mb-3">
+              <div className="avatar-ring-sm shrink-0">
+                <div className="w-10 h-10 rounded-full bg-white/8 flex items-center justify-center text-xs font-black">
                   {video.startupProfile?.companyName?.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
+                </div>
+              </div>
               <div>
-                <h3 className="font-bold text-white text-base leading-tight">{video.startupProfile?.companyName}</h3>
+                <h3 className="font-extrabold text-white text-base leading-tight" style={{ textShadow: "0 0 12px rgba(255,255,255,0.2)" }}>
+                  {video.startupProfile?.companyName}
+                </h3>
                 {video.startupProfile?.stage && (
-                  <span className="text-white/60 text-xs">{video.startupProfile.stage} · {video.startupProfile.industry}</span>
+                  <span style={{ color: "rgba(167,210,255,0.55)", fontSize: "0.75rem" }}>
+                    {video.startupProfile.stage} · {video.startupProfile.industry}
+                  </span>
                 )}
               </div>
             </div>
             <p className="text-white/90 text-sm font-semibold mb-1">{video.title}</p>
-            <p className="text-white/65 text-xs line-clamp-2 mb-3">{video.description}</p>
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                className="bg-white text-black hover:bg-white/90 rounded-full font-semibold"
-                onClick={() => setLocation("/swipe")}
-              >
-                Apply Now
-              </Button>
-            </div>
+            <p className="text-white/55 text-xs line-clamp-2 mb-3 leading-relaxed">{video.description}</p>
+            <button
+              onClick={() => setLocation("/swipe")}
+              className="px-5 py-2 rounded-full text-sm font-bold bg-white text-black hover:bg-white/90 transition-all neon-cta"
+            >
+              Apply Now
+            </button>
           </div>
 
-          {/* Actions */}
           <div className="flex flex-col items-center gap-5 pb-2">
             <button onClick={() => onLike(video.id)} className="flex flex-col items-center gap-1 group">
-              <div className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/10 group-hover:bg-black/60 transition-colors">
-                <Heart className="h-5 w-5 text-white" />
+              <div className="w-11 h-11 rounded-full backdrop-blur-md flex items-center justify-center border border-white/12 group-hover:border-red-400/40 transition-all"
+                style={{ background: "rgba(0,0,0,0.45)" }}>
+                <Heart className="h-5 w-5 text-white/70 group-hover:text-red-400 transition-colors" />
               </div>
-              <span className="text-white text-[10px] font-medium">{video.likes}</span>
+              <span className="text-white/50 text-[10px] font-medium">{video.likes}</span>
             </button>
 
             <button className="flex flex-col items-center gap-1 group">
-              <div className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/10 group-hover:bg-black/60 transition-colors">
-                <MessageSquare className="h-5 w-5 text-white" />
+              <div className="w-11 h-11 rounded-full backdrop-blur-md flex items-center justify-center border border-white/12 group-hover:border-white/25 transition-all"
+                style={{ background: "rgba(0,0,0,0.45)" }}>
+                <MessageSquare className="h-5 w-5 text-white/70" />
               </div>
-              <span className="text-white text-[10px] font-medium">DM</span>
+              <span className="text-white/50 text-[10px] font-medium">DM</span>
             </button>
 
             <button className="flex flex-col items-center gap-1 group">
-              <div className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/10 group-hover:bg-black/60 transition-colors">
-                <Share2 className="h-5 w-5 text-white" />
+              <div className="w-11 h-11 rounded-full backdrop-blur-md flex items-center justify-center border border-white/12 group-hover:border-white/25 transition-all"
+                style={{ background: "rgba(0,0,0,0.45)" }}>
+                <Share2 className="h-5 w-5 text-white/70" />
               </div>
-              <span className="text-white text-[10px] font-medium">Share</span>
+              <span className="text-white/50 text-[10px] font-medium">Share</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Top label */}
-      <div className="absolute top-4 left-4 z-10">
-        <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest">Startup Pitch</span>
-      </div>
+      <div className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
+        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.7), transparent)" }} />
     </div>
   );
 }
 
-// ── Feed page ──────────────────────────────────────────────────────────────────
 export default function Feed() {
   const { user } = useAuth();
   const isTalent = user?.userType === "talent";
@@ -275,13 +265,14 @@ export default function Feed() {
   const { data: videosData, isLoading: videosLoading } = useListVideos({ limit: 10 });
   const { data: talentData, isLoading: talentLoading } = useListTalent(
     { limit: 20 },
-    { query: { enabled: !isTalent } }
+    { query: { enabled: !isTalent, queryKey: ["feedTalent"] } }
   );
   const likeVideo = useLikeVideo();
   const { toast } = useToast();
 
   const videos = videosData?.videos || [];
-  const talentProfiles = talentData?.profiles || [];
+  const talentProfilesRaw = talentData?.profiles || [];
+  const talentProfiles = talentProfilesRaw.length > 0 ? talentProfilesRaw : DEMO_TALENT;
 
   const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -309,36 +300,23 @@ export default function Feed() {
     return (
       <AppLayout>
         <div className="h-[calc(100vh-80px)] flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-        </div>
-      </AppLayout>
-    );
-  }
-
-  // ── Founder: no talent yet ──
-  if (!isTalent && talentProfiles.length === 0) {
-    return (
-      <AppLayout>
-        <div className="h-[calc(100vh-80px)] flex items-center justify-center text-center p-4">
-          <div>
-            <Info className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-xl font-bold">No talent reels yet</h2>
-            <p className="text-muted-foreground">Check back soon — candidates are creating their reels now.</p>
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 rounded-full border-2 border-cyan-400/40 border-t-cyan-400 animate-spin" />
+            <p className="text-xs text-muted-foreground font-medium tracking-widest uppercase">Loading feed...</p>
           </div>
         </div>
       </AppLayout>
     );
   }
 
-  // ── Talent: no pitches yet ──
   if (isTalent && videos.length === 0) {
     return (
       <AppLayout>
         <div className="h-[calc(100vh-80px)] flex items-center justify-center text-center p-4">
           <div>
-            <Info className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <Radio className="h-12 w-12 mx-auto mb-4 text-muted-foreground/40" />
             <h2 className="text-xl font-bold">No pitches yet</h2>
-            <p className="text-muted-foreground">Check back later for new startup pitches.</p>
+            <p className="text-muted-foreground text-sm mt-2">Check back later for new startup pitches.</p>
           </div>
         </div>
       </AppLayout>
@@ -348,15 +326,21 @@ export default function Feed() {
   return (
     <AppLayout>
       {/* Tab header */}
-      <div className="md:hidden sticky top-0 z-10 flex items-center justify-center py-2 bg-black/80 backdrop-blur-sm border-b border-white/5">
-        <span className="text-xs font-bold text-white/50 uppercase tracking-widest">
+      <div className="md:hidden sticky top-0 z-10 flex items-center justify-center gap-3 py-2.5 border-b border-white/[0.06]"
+        style={{ background: "rgba(4,4,4,0.88)", backdropFilter: "blur(16px)" }}>
+        <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase"
+          style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)", color: "rgba(252,165,165,0.8)" }}>
+          <span className="w-1.5 h-1.5 rounded-full bg-red-400 live-dot" />
+          LIVE
+        </span>
+        <span className="section-header-gradient">
           {isTalent ? "Startup Pitches" : "Talent Reels"}
         </span>
       </div>
 
       <div
         ref={containerRef}
-        className="h-[calc(100dvh-120px)] md:h-[calc(100dvh-0px)] w-full max-w-md mx-auto overflow-y-scroll snap-y snap-mandatory relative bg-black no-scrollbar"
+        className="h-[calc(100dvh-120px)] md:h-[calc(100dvh-0px)] w-full max-w-md mx-auto overflow-y-scroll snap-y snap-mandatory relative bg-black no-scrollbar scrollbar-none"
       >
         {isTalent
           ? videos.map((video, index) => (
