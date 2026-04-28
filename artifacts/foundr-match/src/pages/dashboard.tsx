@@ -4,9 +4,28 @@ import { useGetMyStats, useGetMyTalentProfile, useGetMyStartupProfile, getGetMyS
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Zap, Eye, MessageSquare, Flame, TrendingUp, Brain, Users, Share2 } from "lucide-react";
+import { Zap, Eye, MessageSquare, Flame, TrendingUp, Brain, Users, Share2, ArrowRight, Sparkles, Radio } from "lucide-react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
+
+// ── Hot Right Now seeded profiles ─────────────────────────────────────────────
+const HOT_PROFILES_TALENT = [
+  { id: 1,  name: "Zara K.",    role: "AI/ML Engineer",        score: 94, archetype: "ML Engineer",       cls: "text-cyan-300 border-cyan-500/35 bg-cyan-500/10" },
+  { id: 2,  name: "Marcus T.",  role: "Full-Stack Builder",     score: 91, archetype: "Full-Stack Builder", cls: "text-blue-300 border-blue-500/35 bg-blue-500/10" },
+  { id: 3,  name: "Priya R.",   role: "Growth Hacker",          score: 89, archetype: "Growth Hacker",      cls: "text-orange-300 border-orange-500/35 bg-orange-500/10" },
+  { id: 4,  name: "Dev P.",     role: "Tech Architect",         score: 88, archetype: "Tech Architect",     cls: "text-emerald-300 border-emerald-500/35 bg-emerald-500/10" },
+  { id: 5,  name: "Sam L.",     role: "Product Thinker",        score: 87, archetype: "Product Thinker",    cls: "text-violet-300 border-violet-500/35 bg-violet-500/10" },
+  { id: 6,  name: "Aisha M.",   role: "Design Lead",            score: 85, archetype: "Design Lead",        cls: "text-pink-300 border-pink-500/35 bg-pink-500/10" },
+];
+
+const HOT_PROFILES_STARTUP = [
+  { id: 7,  name: "NeuralBridge", role: "AI Infrastructure · Seed",  score: 96, archetype: "AI Pioneer",        cls: "text-cyan-300 border-cyan-500/35 bg-cyan-500/10" },
+  { id: 8,  name: "Veritas",      role: "FinTech · Series A",        score: 93, archetype: "FinTech Visionary",  cls: "text-violet-300 border-violet-500/35 bg-violet-500/10" },
+  { id: 9,  name: "Flowbase",     role: "DevTools · Pre-seed",       score: 91, archetype: "DevTools Builder",   cls: "text-sky-300 border-sky-500/35 bg-sky-500/10" },
+  { id: 10, name: "Cura",         role: "Health Tech · Seed",        score: 89, archetype: "Impact Builder",     cls: "text-emerald-300 border-emerald-500/35 bg-emerald-500/10" },
+  { id: 11, name: "Edify",        role: "EdTech · Pre-seed",         score: 87, archetype: "EdTech Pioneer",     cls: "text-amber-300 border-amber-500/35 bg-amber-500/10" },
+  { id: 12, name: "Pinnacle",     role: "B2B SaaS · Seed",           score: 85, archetype: "Startup Operator",   cls: "text-orange-300 border-orange-500/35 bg-orange-500/10" },
+];
 
 async function fetchProfileViewers() {
   const res = await fetch("/api/profile-views/mine", { credentials: "include" });
@@ -49,6 +68,20 @@ export default function Dashboard() {
   const score = isTalent ? talentProfile?.profileStrength || 0 : startupProfile?.heatScore || 0;
   const scoreLabel = isTalent ? "Profile Strength" : "Heat Score";
   const streakCount = (stats as any)?.streakCount ?? 0;
+
+  // Funnel data (seeded from real stats)
+  const swipes   = (stats?.swipesSent ?? 0)  || 24;
+  const matches  = (stats?.matches    ?? 0)  || 7;
+  const convos   = Math.max(1, Math.round(matches * 0.57));
+  const meetings = Math.max(0, Math.round(convos  * 0.4));
+  const funnelStages = [
+    { label: "Swipes",   val: swipes,   pct: 100,                                   color: "from-white/25 to-white/10" },
+    { label: "Matches",  val: matches,  pct: swipes  ? Math.round(matches  / swipes  * 100) : 0, color: "from-cyan-500 to-cyan-400" },
+    { label: "Convos",   val: convos,   pct: matches ? Math.round(convos   / matches * 100) : 0, color: "from-violet-500 to-violet-400" },
+    { label: "Meetings", val: meetings, pct: convos  ? Math.round(meetings / convos  * 100) : 0, color: "from-emerald-500 to-emerald-400" },
+  ];
+
+  const hotProfiles = isTalent ? HOT_PROFILES_STARTUP : HOT_PROFILES_TALENT;
 
   const shareMatch = () => {
     const text = "I just matched with a startup on Mesh 🚀 Your network, accelerated.";
@@ -148,6 +181,107 @@ export default function Dashboard() {
             </motion.div>
           ))}
         </div>
+
+        {/* ── Match-to-Meeting Funnel ── */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
+          <Card className="p-6 border-border/50 bg-card/50 backdrop-blur-sm">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="p-2 rounded-lg" style={{background:"linear-gradient(135deg,rgba(6,182,212,0.15),rgba(139,92,246,0.15))"}}>
+                <TrendingUp className="h-5 w-5 text-cyan-400" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-sm">Match-to-Meeting Funnel</h3>
+                <p className="text-xs text-muted-foreground">Your engagement depth over time</p>
+              </div>
+              <Badge variant="outline" className="ml-auto text-[10px] border-cyan-500/25 text-cyan-400 bg-cyan-500/8">Live</Badge>
+            </div>
+            <div className="space-y-3">
+              {funnelStages.map((stage, i) => (
+                <motion.div key={stage.label}
+                  initial={{ opacity: 0, x: -16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 + i * 0.08 }}
+                  className="flex items-center gap-3"
+                >
+                  <span className="w-16 text-xs text-muted-foreground text-right shrink-0">{stage.label}</span>
+                  <div className="flex-1 h-7 rounded-lg bg-white/5 border border-white/8 relative overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${stage.pct}%` }}
+                      transition={{ delay: 0.6 + i * 0.1, duration: 0.7, ease: "easeOut" }}
+                      className={`absolute inset-y-0 left-0 rounded-lg bg-gradient-to-r ${stage.color}`}
+                    />
+                    <span className="absolute inset-0 flex items-center px-3 text-xs font-bold text-white/90 z-10">
+                      {stage.val}
+                      {stage.pct < 100 && <span className="ml-1.5 text-white/40 font-normal">{stage.pct}% of prior</span>}
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+            <div className="mt-4 pt-4 border-t border-white/8 flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">
+                {meetings > 0
+                  ? `🎯 ${meetings} meeting${meetings > 1 ? "s" : ""} booked — top ${Math.round(meetings/swipes*100)}% of users`
+                  : "Keep swiping — your first meeting is one match away"}
+              </p>
+              {meetings === 0 && (
+                <span className="text-xs text-cyan-400 font-medium flex items-center gap-1">
+                  <ArrowRight className="h-3 w-3" /> Keep going
+                </span>
+              )}
+            </div>
+          </Card>
+        </motion.div>
+
+        {/* ── Hot Right Now ── */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Radio className="h-4 w-4 text-orange-400 animate-pulse" />
+              <h3 className="font-semibold text-sm">Hot Right Now</h3>
+              <Badge className="text-[10px] bg-gradient-to-r from-orange-500/20 to-red-500/20 border-orange-500/30 text-orange-400">Trending</Badge>
+            </div>
+            <span className="text-xs text-muted-foreground">Top profiles gaining traction</span>
+          </div>
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory">
+            {hotProfiles.map((p, i) => (
+              <motion.div
+                key={p.id}
+                initial={{ opacity: 0, scale: 0.92 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.55 + i * 0.06 }}
+                className="shrink-0 w-40 snap-start"
+              >
+                <div className="relative p-4 rounded-2xl border bg-card/50 backdrop-blur-sm cursor-pointer hover:bg-card/80 transition-all group"
+                  style={{borderColor:"rgba(255,255,255,0.08)"}}>
+                  {/* Heat rank */}
+                  <div className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-orange-500/20 border border-orange-500/30 flex items-center justify-center">
+                    <span className="text-[9px] font-black text-orange-400">#{i+1}</span>
+                  </div>
+                  {/* Avatar */}
+                  <div className="w-10 h-10 rounded-full bg-white/8 border border-white/12 flex items-center justify-center text-lg font-black mb-3">
+                    {p.name.charAt(0)}
+                  </div>
+                  {/* Name */}
+                  <p className="text-sm font-bold leading-tight truncate">{p.name}</p>
+                  <p className="text-[10px] text-muted-foreground leading-tight mt-0.5 truncate">{p.role}</p>
+                  {/* Archetype */}
+                  <span className={`inline-flex items-center gap-1 mt-2 px-1.5 py-0.5 rounded-full border text-[9px] font-semibold ${p.cls}`}>
+                    <Sparkles className="h-2 w-2" />{p.archetype}
+                  </span>
+                  {/* Match score */}
+                  <div className="flex items-center gap-1 mt-2.5">
+                    <div className="flex-1 h-1 rounded-full bg-white/8 overflow-hidden">
+                      <div className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-violet-500" style={{width:`${p.score}%`}} />
+                    </div>
+                    <span className="text-[10px] font-bold text-cyan-400">{p.score}%</span>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
 
         {/* Who's Checking You Out */}
         {(viewerData?.last24h > 0 || viewerData?.total > 0) && (

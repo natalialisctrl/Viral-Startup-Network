@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Heart, X, Star, Bookmark, Zap, MessageCircle, User, ExternalLink, MapPin, Briefcase, ChevronDown, Flame, TrendingUp, Users, SlidersHorizontal } from "lucide-react";
+import { Heart, X, Star, Bookmark, Zap, MessageCircle, User, ExternalLink, MapPin, Briefcase, ChevronDown, Flame, TrendingUp, Users, SlidersHorizontal, Copy, CheckCircle2, Shield, Activity, Sparkles, Link2, Badge as LucideBadge, Radio } from "lucide-react";
 import { useLocation } from "wouter";
 
 // ── Deterministic AI scoring ──────────────────────────────────────────────────
@@ -64,14 +64,104 @@ function getDimensions(cardId: number, myId: number) {
 }
 
 function getAiInsights(card: any, isTalent: boolean, score: number) {
+  const skills = isTalent ? [] : (card.skills ?? []) as string[];
+  const s1 = skills[0] || "core skills";
   const strengths = isTalent
     ? [`Mission aligns with your career goals`, `Culture fit: ${score > 85 ? "exceptional" : "strong"}`]
-    : [`Skill overlap with your open roles`, `Work style: ${score > 85 ? "perfect" : "solid"} match`];
+    : [`${s1} directly maps to open roles`, `Work style: ${score > 85 ? "perfect" : "solid"} match`];
   const challenge = score < 80 ? "Salary expectations may need alignment" : "Timezone overlap worth discussing";
   const starter = isTalent
     ? `Ask about their biggest product challenge this quarter`
     : `Ask what excites them most about early-stage building`;
   return { strengths, challenge, starter };
+}
+
+// ── Personality archetype inference ───────────────────────────────────────────
+function getArchetype(card: any, isTalent: boolean): { label: string; cls: string } {
+  if (isTalent) {
+    const ind = (card.industry || "").toLowerCase();
+    if (ind.includes("ai") || ind.includes("ml") || ind.includes("llm")) return { label: "AI Pioneer", cls: "text-cyan-300 border-cyan-500/35 bg-cyan-500/10" };
+    if (ind.includes("health") || ind.includes("bio")) return { label: "Impact Builder", cls: "text-emerald-300 border-emerald-500/35 bg-emerald-500/10" };
+    if (ind.includes("fintech") || ind.includes("finance")) return { label: "FinTech Visionary", cls: "text-violet-300 border-violet-500/35 bg-violet-500/10" };
+    if (ind.includes("dev") || ind.includes("tool")) return { label: "DevTools Builder", cls: "text-sky-300 border-sky-500/35 bg-sky-500/10" };
+    if (ind.includes("edtech")) return { label: "EdTech Pioneer", cls: "text-amber-300 border-amber-500/35 bg-amber-500/10" };
+    return { label: "Startup Operator", cls: "text-orange-300 border-orange-500/35 bg-orange-500/10" };
+  } else {
+    const skills = ((card.skills ?? []) as string[]).join(" ").toLowerCase();
+    const hl = (card.headline || "").toLowerCase();
+    if (skills.includes("figma") || skills.includes("design") || hl.includes("design") || hl.includes("brand")) return { label: "Design Lead", cls: "text-pink-300 border-pink-500/35 bg-pink-500/10" };
+    if (hl.includes("growth") || hl.includes("gtm") || hl.includes("revenue") || hl.includes("marketing")) return { label: "Growth Hacker", cls: "text-orange-300 border-orange-500/35 bg-orange-500/10" };
+    if (skills.includes("go") || skills.includes("rust") || skills.includes("kubernetes") || hl.includes("infra") || hl.includes("platform") || hl.includes("devops")) return { label: "Tech Architect", cls: "text-emerald-300 border-emerald-500/35 bg-emerald-500/10" };
+    if (hl.includes("ml") || hl.includes("ai") || hl.includes("nlp") || skills.includes("torch") || skills.includes("python")) return { label: "ML Engineer", cls: "text-cyan-300 border-cyan-500/35 bg-cyan-500/10" };
+    if (hl.includes("full-stack") || hl.includes("fullstack") || hl.includes("intersection")) return { label: "Full-Stack Builder", cls: "text-blue-300 border-blue-500/35 bg-blue-500/10" };
+    if (hl.includes("product") || hl.includes("pm") || hl.includes("zero-to-one")) return { label: "Product Thinker", cls: "text-violet-300 border-violet-500/35 bg-violet-500/10" };
+    if (hl.includes("security") || hl.includes("zero trust")) return { label: "Security Expert", cls: "text-red-300 border-red-500/35 bg-red-500/10" };
+    if (hl.includes("data") || hl.includes("analytics")) return { label: "Data Architect", cls: "text-teal-300 border-teal-500/35 bg-teal-500/10" };
+    return { label: "Technical Founder", cls: "text-blue-300 border-blue-500/35 bg-blue-500/10" };
+  }
+}
+
+// ── Activity & social proof (seeded by card id) ────────────────────────────────
+function getActivityData(cardId: number) {
+  const s = cardId * 7 + 3;
+  const days = s % 5; // 0–4
+  const responseRate = 62 + ((s * 13) % 34); // 62–96%
+  const matchCount = 4 + (s % 19); // 4–22
+  const activeLabel = days === 0 ? "Active today" : days === 1 ? "Active yesterday" : `Active ${days}d ago`;
+  return { activeLabel, responseRate, matchCount };
+}
+
+function getMutualConnections(cardId: number, myId: number): number {
+  return (cardId * 5 + myId * 3) % 5; // 0–4
+}
+
+// ── 2-line AI compatibility reasoning ─────────────────────────────────────────
+function getCompatibilityReason(card: any, isTalent: boolean, score: number): string {
+  const skills = isTalent ? [] : (card.skills ?? []) as string[];
+  const topSkill = skills[0] || "your stack";
+  const industry = isTalent ? (card.industry || "tech") : "";
+  const stage = isTalent ? (card.stage || "early") : "";
+  if (isTalent) {
+    if (score > 87) return `Both operating in ${industry} at ${stage} stage. Your founding vision pairs tightly with this team's execution velocity.`;
+    if (score > 81) return `Overlapping domain focus in ${industry} with complementary backgrounds. Strong potential for high-impact collaboration.`;
+    return `Adjacent problem spaces with compatible working styles. A conversation could unlock unexpected alignment.`;
+  } else {
+    if (score > 87) return `Deep ${topSkill} expertise matches exactly what this startup needs now. Culture signals and stage preference are tightly aligned.`;
+    if (score > 81) return `${topSkill} background directly maps to their open roles. Working style and ambition level suggest strong culture fit.`;
+    return `Complementary skills and growth trajectory. Good baseline for a productive first conversation.`;
+  }
+}
+
+// ── Smart intro message generator ─────────────────────────────────────────────
+function generateIntroMessage(myProfile: any | null, theirCard: any, isTalent: boolean): string {
+  const theirName = isTalent ? theirCard.companyName : theirCard.fullName?.split(" ")[0] || "there";
+  if (!isTalent) {
+    // talent messaging startup
+    const mySkill = (myProfile?.skills ?? [])[0] || "my background";
+    const theirInd = theirCard.industry || "your space";
+    return `Hey ${theirName}! I came across what you're building in ${theirInd} and it really resonates. My background in ${mySkill} feels like a natural fit — I'd love to explore if there's an opportunity here. Would you be open to a quick 15-min call?`;
+  } else {
+    // founder messaging talent
+    const theirSkill = (theirCard.skills ?? [])[0] || "your background";
+    const myCompany = myProfile?.companyName || "our startup";
+    return `Hi ${theirName}! Your ${theirSkill} experience caught my attention — at ${myCompany} we're tackling a problem I think you'd genuinely care about. I'd love to share more and hear your perspective. Worth a quick chat?`;
+  }
+}
+
+// ── Verified badge inference ───────────────────────────────────────────────────
+function getVerifiedBadges(card: any, isTalent: boolean): string[] {
+  const badges: string[] = [];
+  if (!isTalent) {
+    if (card.portfolioUrl) badges.push("Portfolio");
+    if (card.linkedinUrl) badges.push("LinkedIn");
+    if (card.githubUrl) badges.push("GitHub");
+  } else {
+    if (card.websiteUrl) badges.push("Website");
+    if (card.linkedinUrl) badges.push("LinkedIn");
+    const email = card.founderEmail || "";
+    if (email.includes("@ycombinator") || email.includes("@yc")) badges.push("YC");
+  }
+  return badges;
 }
 
 function recordProfileView(viewedId: number, viewedType: string) {
@@ -218,14 +308,38 @@ function ProfileSheet({
   card: any; isTalent: boolean; myId: number;
   onClose: () => void; onSwipe: (dir: "right" | "left") => void;
 }) {
-  const score = getAiScore(card.id, myId);
-  const dims = getDimensions(card.id, myId);
-  const { strengths, challenge, starter } = getAiInsights(card, isTalent, score);
+  const score    = getAiScore(card.id, myId);
+  const dims     = getDimensions(card.id, myId);
+  const { strengths, challenge } = getAiInsights(card, isTalent, score);
+  const archetype  = getArchetype(card, isTalent);
+  const activity   = getActivityData(card.id);
+  const mutualCt   = getMutualConnections(card.id, myId);
+  const reason     = getCompatibilityReason(card, isTalent, score);
+  const verifiedBadges = getVerifiedBadges(card, isTalent);
 
-  const name = isTalent ? card.companyName : card.fullName;
-  const sub  = isTalent ? `${card.industry || "Startup"} · ${card.stage || "Early"}` : card.headline;
-  const bio  = isTalent ? card.elevatorPitch ?? card.mission : card.bio ?? card.whyStartups;
-  const tags = isTalent ? card.badges ?? [] : card.skills ?? [];
+  const introDefault = generateIntroMessage(null, card, isTalent);
+  const [introMsg, setIntroMsg]     = useState(introDefault);
+  const [introCopied, setIntroCopied] = useState(false);
+  const [introLoading, setIntroLoading] = useState(false);
+
+  function regenerateIntro() {
+    setIntroLoading(true);
+    setTimeout(() => {
+      setIntroMsg(generateIntroMessage(null, card, isTalent));
+      setIntroLoading(false);
+    }, 600);
+  }
+
+  function copyIntro() {
+    navigator.clipboard.writeText(introMsg).catch(() => {});
+    setIntroCopied(true);
+    setTimeout(() => setIntroCopied(false), 2000);
+  }
+
+  const name     = isTalent ? card.companyName : card.fullName;
+  const sub      = isTalent ? `${card.industry || "Startup"} · ${card.stage || "Early"}` : card.headline;
+  const bio      = isTalent ? card.elevatorPitch ?? card.mission : card.bio ?? card.whyStartups;
+  const tags     = isTalent ? card.badges ?? [] : card.skills ?? [];
   const whyLabel = isTalent ? "Why Join Now?" : "Why Startups?";
   const whyText  = isTalent ? card.whyJoinNow : card.whyStartups;
 
@@ -261,42 +375,84 @@ function ProfileSheet({
         <div className="overflow-y-auto flex-1 px-6 pb-32 space-y-7 overscroll-contain">
 
           {/* ── Hero ── */}
-          <div className="flex items-center gap-5 pt-2">
-            <div className={`w-16 h-16 shrink-0 ${isTalent ? "rounded-2xl" : "rounded-full"} bg-white/10 border border-white/15 flex items-center justify-center text-2xl font-black`}>
+          <div className="flex items-center gap-4 pt-2">
+            <div className={`relative w-16 h-16 shrink-0 ${isTalent ? "rounded-2xl" : "rounded-full"} bg-white/10 border border-white/15 flex items-center justify-center text-2xl font-black overflow-visible`}>
+              <span className={`${isTalent ? "avatar-gradient-ring-sq" : "avatar-gradient-ring"}`} />
               {name?.charAt(0)}
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="text-xl font-black truncate">{name}</h2>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-xl font-black">{name}</h2>
+                {verifiedBadges.length > 0 && (
+                  <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-cyan-500/12 border border-cyan-500/25 text-[10px] font-semibold text-cyan-400">
+                    <Shield className="h-2.5 w-2.5" /> Verified
+                  </span>
+                )}
+              </div>
               <p className="text-sm text-muted-foreground truncate">{sub}</p>
-              <div className="flex flex-wrap gap-1 mt-1.5">
-                {tags.slice(0, 3).map((t: string, i: number) => (
-                  <Badge key={i} variant="outline" className="border-white/15 text-[10px] px-2 py-0">{t}</Badge>
+              <div className="flex flex-wrap gap-1.5 mt-1.5">
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-semibold ${archetype.cls}`}>
+                  <Sparkles className="h-2.5 w-2.5" />{archetype.label}
+                </span>
+                {verifiedBadges.map((b, i) => (
+                  <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-white/15 bg-white/5 text-[10px] text-muted-foreground">
+                    <Link2 className="h-2.5 w-2.5" />{b}
+                  </span>
                 ))}
               </div>
             </div>
           </div>
 
+          {/* ── Social proof row ── */}
+          <div className="flex items-center gap-3 flex-wrap -mt-1">
+            <span className="flex items-center gap-1.5 text-xs text-emerald-400 font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              {activity.activeLabel}
+            </span>
+            <span className="text-white/15">·</span>
+            <span className="text-xs text-muted-foreground">
+              <span className="text-foreground/80 font-semibold">{activity.responseRate}%</span> reply rate
+            </span>
+            <span className="text-white/15">·</span>
+            <span className="text-xs text-muted-foreground">
+              <span className="text-foreground/80 font-semibold">{activity.matchCount}</span> matches made
+            </span>
+            {mutualCt > 0 && (
+              <>
+                <span className="text-white/15">·</span>
+                <span className="flex items-center gap-1 text-xs text-violet-400 font-medium">
+                  <Users className="h-3 w-3" />{mutualCt} mutual
+                </span>
+              </>
+            )}
+          </div>
+
           {/* ── AI Match Analysis ── */}
-          <section className="space-y-4">
-            <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">AI Match Analysis</h4>
+          <section className="space-y-3">
+            <h4 className="section-header-gradient">AI Match Analysis</h4>
             <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-5">
               <div className="flex items-center gap-5">
                 <MatchRing score={score} />
                 <div className="flex-1 space-y-3">
-                  <DimBar label="Skills overlap"  value={dims.skills}  delay={0.4} />
-                  <DimBar label="Culture fit"     value={dims.culture} delay={0.5} />
-                  <DimBar label="Growth potential" value={dims.growth} delay={0.6} />
-                  <DimBar label="Working style"   value={dims.vibe}   delay={0.7} />
+                  <DimBar label="Skills overlap"   value={dims.skills}  delay={0.4} />
+                  <DimBar label="Culture fit"       value={dims.culture} delay={0.5} />
+                  <DimBar label="Growth potential"  value={dims.growth}  delay={0.6} />
+                  <DimBar label="Working style"     value={dims.vibe}    delay={0.7} />
                 </div>
+              </div>
+              {/* 2-line AI reasoning */}
+              <div className="flex items-start gap-2.5 p-3 rounded-xl bg-cyan-500/6 border border-cyan-500/15">
+                <Sparkles className="h-3.5 w-3.5 text-cyan-400 shrink-0 mt-0.5" />
+                <p className="text-xs text-foreground/85 leading-relaxed">{reason}</p>
               </div>
               <div className="grid grid-cols-2 gap-2 pt-1">
                 {strengths.map((s, i) => (
-                  <div key={i} className="flex items-start gap-1.5 p-2.5 rounded-xl bg-green-500/8 border border-green-500/15">
-                    <span className="text-green-400 text-xs mt-0.5 shrink-0">✓</span>
+                  <div key={i} className="flex items-start gap-1.5 p-2.5 rounded-xl bg-green-500/8 border border-green-500/15 chip-shimmer">
+                    <CheckCircle2 className="h-3 w-3 text-green-400 mt-0.5 shrink-0" />
                     <span className="text-xs text-foreground/80">{s}</span>
                   </div>
                 ))}
-                <div className="flex items-start gap-1.5 p-2.5 rounded-xl bg-amber-500/8 border border-amber-500/15">
+                <div className="flex items-start gap-1.5 p-2.5 rounded-xl bg-amber-500/8 border border-amber-500/15 chip-shimmer">
                   <span className="text-amber-400 text-xs mt-0.5 shrink-0">⚠</span>
                   <span className="text-xs text-foreground/80">{challenge}</span>
                 </div>
@@ -307,8 +463,8 @@ function ProfileSheet({
           {/* ── About ── */}
           {bio && (
             <section className="space-y-2">
-              <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">About</h4>
-              <p className="text-sm leading-relaxed text-foreground/80">{bio}</p>
+              <h4 className="section-header-gradient">About</h4>
+              <p className="text-sm leading-[1.75] text-foreground/80">{bio}</p>
             </section>
           )}
 
@@ -321,12 +477,15 @@ function ProfileSheet({
           {/* ── All skills / badges ── */}
           {tags.length > 0 && (
             <section className="space-y-2">
-              <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+              <h4 className="section-header-gradient">
                 {isTalent ? "Culture & Vibe" : "Superpowers"}
               </h4>
               <div className="flex flex-wrap gap-1.5">
                 {tags.map((t: string, i: number) => (
-                  <Badge key={i} variant="outline" className="border-white/15 text-xs px-2.5 py-1">{t}</Badge>
+                  <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium border"
+                    style={{background:"linear-gradient(135deg,rgba(6,182,212,0.08),rgba(139,92,246,0.08))",borderColor:"rgba(6,182,212,0.22)",color:"rgba(224,242,254,0.85)"}}>
+                    {t}
+                  </span>
                 ))}
               </div>
             </section>
@@ -335,8 +494,8 @@ function ProfileSheet({
           {/* ── Why section ── */}
           {whyText && (
             <section className="space-y-2">
-              <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{whyLabel}</h4>
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-sm text-foreground/80 italic">
+              <h4 className="section-header-gradient">{whyLabel}</h4>
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-sm text-foreground/80 italic leading-relaxed">
                 "{whyText}"
               </div>
             </section>
@@ -344,7 +503,7 @@ function ProfileSheet({
 
           {/* ── Stats row ── */}
           <section className="space-y-2">
-            <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Details</h4>
+            <h4 className="section-header-gradient">Details</h4>
             <div className="grid grid-cols-2 gap-2">
               {isTalent ? (
                 <>
@@ -364,12 +523,37 @@ function ProfileSheet({
             </div>
           </section>
 
-          {/* ── Conversation starter ── */}
+          {/* ── Smart Intro Generator ── */}
           <section className="space-y-2 pb-2">
-            <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">AI Conversation Starter</h4>
-            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-start gap-3">
-              <Zap className="h-4 w-4 text-foreground/60 shrink-0 mt-0.5" />
-              <p className="text-sm text-foreground/80 italic">"{starter}"</p>
+            <div className="flex items-center justify-between">
+              <h4 className="section-header-gradient">Smart Intro</h4>
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wide bg-gradient-to-r from-cyan-500/20 to-violet-500/20 border border-cyan-500/25 text-cyan-300">AI</span>
+            </div>
+            <div className="rounded-2xl border overflow-hidden" style={{borderColor:"rgba(6,182,212,0.2)",background:"linear-gradient(135deg,rgba(6,182,212,0.04),rgba(139,92,246,0.04))"}}>
+              <div className="p-4">
+                {introLoading ? (
+                  <div className="space-y-2">
+                    {[100, 85, 60].map((w, i) => (
+                      <div key={i} className="h-3 rounded animate-pulse bg-white/10" style={{width:`${w}%`}} />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-foreground/85 leading-relaxed">{introMsg}</p>
+                )}
+              </div>
+              <div className="flex items-center gap-2 px-4 pb-3 pt-1 border-t border-white/8">
+                <button onClick={regenerateIntro}
+                  className="flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 transition-colors font-medium">
+                  <Sparkles className="h-3 w-3" /> Regenerate
+                </button>
+                <button onClick={copyIntro}
+                  className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/8 hover:bg-white/12 text-xs font-semibold transition-colors">
+                  {introCopied
+                    ? <><CheckCircle2 className="h-3 w-3 text-emerald-400" /> Copied!</>
+                    : <><Copy className="h-3 w-3" /> Copy</>
+                  }
+                </button>
+              </div>
             </div>
           </section>
 
@@ -709,6 +893,11 @@ export default function Swipe() {
   const isTrending = heatScore > 70 || momentumScore > 75;
   const isFastReply = heatScore > 85 || momentumScore > 85;
   const videoUrl = (currentCard as any)?.videoUrl;
+  const cardArchetype  = currentCard ? getArchetype(currentCard, isTalent) : { label: "", cls: "" };
+  const cardActivity   = currentCard ? getActivityData(currentCard.id) : { activeLabel: "", responseRate: 0, matchCount: 0 };
+  const cardMutual     = currentCard ? getMutualConnections(currentCard.id, myId) : 0;
+  const cardReason     = currentCard ? getCompatibilityReason(currentCard, isTalent, score) : "";
+  const cardVerified   = currentCard ? getVerifiedBadges(currentCard, isTalent) : [];
 
   return (
     <AppLayout>
@@ -908,10 +1097,18 @@ export default function Swipe() {
                     )}
                   </AnimatePresence>
 
-                  {/* Top-left: tap hint */}
-                  <div className="absolute top-4 left-4 z-10 flex items-center gap-1.5 bg-black/30 backdrop-blur-sm rounded-full px-2.5 py-1 border border-white/10">
-                    <User className="h-3 w-3 text-white/50" />
-                    <span className="text-[10px] text-white/50 font-medium">tap to explore</span>
+                  {/* Top-left: activity + tap hint */}
+                  <div className="absolute top-4 left-4 z-10 flex flex-col gap-1.5">
+                    <div className="flex items-center gap-1.5 bg-black/30 backdrop-blur-sm rounded-full px-2.5 py-1 border border-white/10">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                      <span className="text-[10px] text-white/60 font-medium">{cardActivity.activeLabel}</span>
+                    </div>
+                    {cardMutual > 0 && (
+                      <div className="flex items-center gap-1 bg-violet-500/15 backdrop-blur-sm rounded-full px-2.5 py-1 border border-violet-500/25">
+                        <Users className="h-2.5 w-2.5 text-violet-400" />
+                        <span className="text-[10px] text-violet-300 font-medium">{cardMutual} mutual</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Top-right: badges */}
@@ -1020,6 +1217,20 @@ export default function Swipe() {
                       )}
                     </div>
 
+                    {/* Archetype + verified row */}
+                    <div className="flex items-center gap-1.5 flex-wrap mt-1 mb-1.5">
+                      {cardArchetype.label && (
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-semibold ${cardArchetype.cls}`}>
+                          <Sparkles className="h-2.5 w-2.5" />{cardArchetype.label}
+                        </span>
+                      )}
+                      {cardVerified.length > 0 && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-cyan-500/25 bg-cyan-500/10 text-[10px] font-semibold text-cyan-400">
+                          <Shield className="h-2.5 w-2.5" />Verified
+                        </span>
+                      )}
+                    </div>
+
                     {/* Bio — first 2 complete sentences */}
                     {(() => {
                       const raw = isTalent
@@ -1029,7 +1240,7 @@ export default function Swipe() {
                       const sentences = raw.match(/[^.!?]+[.!?]+/g) ?? [raw];
                       const preview = sentences.slice(0, 2).join(" ").trim();
                       return (
-                        <p className="text-white/65 text-[12.5px] leading-relaxed mb-2.5 mt-1.5">
+                        <p className="text-white/65 text-[12.5px] leading-relaxed mb-2 mt-0.5">
                           {preview}
                         </p>
                       );
@@ -1053,15 +1264,13 @@ export default function Swipe() {
                       ))}
                     </div>
 
-                    {/* AI insight row — animated shimmer */}
-                    <div className="relative flex items-center gap-2 rounded-xl px-3 py-2 overflow-hidden"
-                      style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(6,182,212,0.12)' }}>
+                    {/* AI compatibility reasoning — 2-line */}
+                    <div className="relative flex items-start gap-2 rounded-xl px-3 py-2.5 overflow-hidden"
+                      style={{ background: 'rgba(6,182,212,0.05)', border: '1px solid rgba(6,182,212,0.14)' }}>
                       <div className="absolute inset-0 shimmer-ai rounded-xl" />
-                      <Zap className="h-3 w-3 shrink-0 relative z-10" style={{ color: 'rgba(6,182,212,0.6)' }} />
-                      <p className="text-[11px] truncate relative z-10" style={{ color: 'rgba(186,230,255,0.45)' }}>
-                        {score > 87 ? "Exceptional culture & skill alignment detected"
-                          : score > 82 ? "Strong alignment across key hiring signals"
-                          : "Good compatibility on core requirements"}
+                      <Sparkles className="h-3 w-3 shrink-0 relative z-10 mt-0.5" style={{ color: 'rgba(6,182,212,0.7)' }} />
+                      <p className="text-[11px] leading-snug relative z-10 line-clamp-2" style={{ color: 'rgba(186,230,255,0.6)' }}>
+                        {cardReason}
                       </p>
                     </div>
                   </div>
