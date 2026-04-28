@@ -1,0 +1,16 @@
+This expanded profile view is definitely where you can make the biggest impression — it's the screen investors and power users will spend the most time on. Here's the prompt:
+
+Prompt for Replit:
+
+Without removing or changing any existing features, data, or layout structure on the expanded profile/detail view, make the following purely visual and aesthetic upgrades:
+
+AI Match Analysis card: Give the entire section a glassmorphism treatment with a cyan-to-violet gradient border that subtly animates/pulses. Make the circular 72% dial glow — the arc should have a neon gradient (cyan → electric blue) with a soft outer glow radiating outward. The progress bars for Skills overlap, Culture fit, Growth potential, and Working style should animate in from left to right when the card loads, with each bar having a gradient fill (teal → purple) and a glowing leading edge.
+Match insight chips ("Skill overlap with your open roles", "Work style: solid match", "Salary expectations may need alignment"): Style these as premium status chips — green ones get a glowing emerald border with dark green glass fill, the amber warning one gets a glowing amber border. Add a very subtle shimmer sweep animation across each chip.
+Section headers ("AI MATCH ANALYSIS", "ABOUT", "WORK & PROJECTS"): Style these with a thin gradient underline (cyan → transparent) and use a slightly wider letter-spacing with a muted cyan color instead of plain gray, so they feel like UI from a sci-fi dashboard.
+Avatar: Replace the plain letter placeholder with a glowing gradient ring around it — animated, cycling through cyan, violet, and electric blue. Add a very subtle hexagonal or geometric background pattern behind the avatar area to give it depth.
+Skill tags (React, TypeScript, Node.js): Same treatment as the Discover card — gradient dark fill with glowing borders, so they feel like active tech identifiers.
+Overall card/page background: Add a very subtle animated gradient background — extremely dark, near-black, but with a slow-moving radial glow in deep violet or midnight blue behind the content, like a living dark environment rather than a flat black screen.
+Typography hierarchy: Make Alex Chen's name larger and bolder with a soft white glow. The subtitle ("Full-Stack Engineer at the intersection...") should be in a muted cyan or lavender. Body text in the About section stays white/light gray but increase line height slightly for readability and premium feel.
+Scroll experience: Add a very subtle fade-in-up animation as each section loads into view while scrolling, so the page feels alive and responsive rather than static.
+
+Preserve all existing data, copy, structure, and interactions exactly as-is.
