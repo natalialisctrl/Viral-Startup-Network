@@ -276,9 +276,21 @@ router.post("/users/demo", async (req, res): Promise<void> => {
     await seedDemoTalentAndMatches(demoUser.id, passwordHash, db);
   }
 
-  (req.session as any).userId = demoUser.id;
-  const { passwordHash: _, ...safeUser } = demoUser;
-  res.json({ ...safeUser, onboardingComplete: true });
+  req.session.regenerate((err) => {
+    if (err) {
+      res.status(500).json({ error: "Session error" });
+      return;
+    }
+    (req.session as any).userId = demoUser.id;
+    req.session.save((saveErr) => {
+      if (saveErr) {
+        res.status(500).json({ error: "Session save error" });
+        return;
+      }
+      const { passwordHash: _, ...safeUser } = demoUser;
+      res.json({ ...safeUser, onboardingComplete: true });
+    });
+  });
 });
 
 router.get("/users", async (req, res): Promise<void> => {
