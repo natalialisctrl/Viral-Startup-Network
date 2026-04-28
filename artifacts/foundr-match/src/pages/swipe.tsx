@@ -999,16 +999,21 @@ export default function Swipe() {
                       )}
                     </div>
 
-                    {/* Bio — 2–3 sentences */}
+                    {/* Bio — capped at ~120 chars / 2 sentences */}
                     {(() => {
-                      const bioText = isTalent
+                      const raw = isTalent
                         ? ((currentCard as any).elevatorPitch ?? (currentCard as any).mission ?? (currentCard as any).bio)
                         : ((currentCard as any).bio ?? (currentCard as any).whyStartups);
-                      return bioText ? (
-                        <p className="text-white/65 text-[12.5px] leading-relaxed line-clamp-3 mb-2.5 mt-1.5">
-                          {bioText}
+                      if (!raw) return null;
+                      const MAX = 120;
+                      const trimmed = raw.length > MAX
+                        ? raw.slice(0, raw.lastIndexOf(" ", MAX)) + "…"
+                        : raw;
+                      return (
+                        <p className="text-white/65 text-[12.5px] leading-relaxed mb-2.5 mt-1.5">
+                          {trimmed}
                         </p>
-                      ) : null;
+                      );
                     })()}
 
                     {/* Tags */}
