@@ -134,20 +134,32 @@ function getCompatibilityReason(card: any, isTalent: boolean, score: number): st
   }
 }
 
-// ── Smart intro message generator ─────────────────────────────────────────────
-function generateIntroMessage(myProfile: any | null, theirCard: any, isTalent: boolean): string {
+// ── Smart intro message generator (3 distinct variants) ───────────────────────
+function generateIntroMessage(myProfile: any | null, theirCard: any, isTalent: boolean, variant = 0): string {
   if (isTalent) {
-    // Talent user sending a message to a STARTUP
-    const theirName = theirCard.companyName || "there";
-    const theirInd = theirCard.industry || "your space";
-    const mySkill = (myProfile?.skills ?? [])[0] || "my background";
-    return `Hey ${theirName}! I came across what you're building in ${theirInd} and it really resonates. My background in ${mySkill} feels like a natural fit — I'd love to explore if there's an opportunity here. Would you be open to a quick 15-min call?`;
+    const theirName  = theirCard.companyName || "there";
+    const theirInd   = theirCard.industry   || "your space";
+    const theirStage = theirCard.stage      || "this stage";
+    const mySkill    = (myProfile?.skills ?? [])[0]
+      ?? myProfile?.headline?.split(" ").slice(0, 3).join(" ")
+      ?? "my background";
+    const variants = [
+      `Hey ${theirName}! I came across what you're building in ${theirInd} and it genuinely resonates. My background in ${mySkill} feels like a natural fit — I'd love to explore if there's an opportunity here. Open to a quick 15-min call?`,
+      `Hi ${theirName} — your ${theirInd} focus at ${theirStage} stage is exactly what I've been looking for. I bring deep ${mySkill} experience and I'd love to hear more about where you're headed. Worth a quick chat?`,
+      `${theirName}, your mission in ${theirInd} caught my eye. I have strong ${mySkill} chops and I've been waiting for the right ${theirStage}-stage team to join. Would love to swap notes on the problem space — 20 mins?`,
+    ];
+    return variants[variant % variants.length];
   } else {
-    // Founder user sending a message to TALENT
-    const theirName = theirCard.fullName?.split(" ")[0] || "there";
+    const theirFirst = theirCard.fullName?.split(" ")[0] || "there";
     const theirSkill = (theirCard.skills ?? [])[0] || "your background";
-    const myCompany = myProfile?.companyName || "our startup";
-    return `Hi ${theirName}! Your ${theirSkill} experience caught my attention — at ${myCompany} we're tackling a problem I think you'd genuinely care about. I'd love to share more and hear your perspective. Worth a quick chat?`;
+    const theirRole  = theirCard.headline?.split("·")[0]?.trim() || "your work";
+    const myCompany  = myProfile?.companyName || "our startup";
+    const variants = [
+      `Hi ${theirFirst}! Your ${theirSkill} experience caught my attention — at ${myCompany} we're tackling a problem I think you'd genuinely care about. I'd love to share more and hear your perspective. Worth a quick chat?`,
+      `${theirFirst}, your ${theirRole} background is exactly what we need at ${myCompany} right now. I've been impressed by your trajectory — would you be open to a 20-min intro call?`,
+      `Hey ${theirFirst} — your ${theirSkill} expertise maps precisely to an open role at ${myCompany}. Rather than a formal pitch, I'd love a real conversation about the problem space. Coffee chat?`,
+    ];
+    return variants[variant % variants.length];
   }
 }
 
@@ -316,9 +328,9 @@ function TractionCard({ profile }: { profile: any }) {
 
 // ── Full-screen profile sheet ─────────────────────────────────────────────────
 function ProfileSheet({
-  card, isTalent, myId, onClose, onSwipe,
+  card, isTalent, myId, myProfile, onClose, onSwipe,
 }: {
-  card: any; isTalent: boolean; myId: number;
+  card: any; isTalent: boolean; myId: number; myProfile: any | null;
   onClose: () => void; onSwipe: (dir: "right" | "left") => void;
 }) {
   const score    = getAiScore(card.id, myId);
@@ -330,17 +342,18 @@ function ProfileSheet({
   const reason     = getCompatibilityReason(card, isTalent, score);
   const verifiedBadges = getVerifiedBadges(card, isTalent);
 
-  const introDefault = generateIntroMessage(null, card, isTalent);
-  const [introMsg, setIntroMsg]     = useState(introDefault);
+  const [introVariant, setIntroVariant] = useState(0);
+  const introMsg = generateIntroMessage(myProfile, card, isTalent, introVariant);
   const [introCopied, setIntroCopied] = useState(false);
   const [introLoading, setIntroLoading] = useState(false);
 
   function regenerateIntro() {
     setIntroLoading(true);
     setTimeout(() => {
-      setIntroMsg(generateIntroMessage(null, card, isTalent));
+      setIntroVariant(v => (v + 1) % 3);
+      setIntroCopied(false);
       setIntroLoading(false);
-    }, 600);
+    }, 500);
   }
 
   function copyIntro() {
@@ -579,31 +592,53 @@ function ProfileSheet({
           {/* ── Smart Intro Generator ── */}
           <motion.section className="space-y-2 pb-2" initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.1 }} transition={{ duration: 0.4 }}>
             <div className="flex items-center justify-between">
-              <h4 className="section-header-gradient">Smart Intro</h4>
+              <div className="flex items-center gap-2">
+                <h4 className="section-header-gradient">Smart Intro</h4>
+                <div className="flex items-center gap-1">
+                  {[0,1,2].map(i => (
+                    <span key={i} className="w-1.5 h-1.5 rounded-full transition-all duration-300"
+                      style={{ background: i === introVariant ? "rgba(6,182,212,0.9)" : "rgba(255,255,255,0.12)" }} />
+                  ))}
+                </div>
+              </div>
               <span className="px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wide bg-gradient-to-r from-cyan-500/20 to-violet-500/20 border border-cyan-500/25 text-cyan-300">AI</span>
             </div>
             <div className="rounded-2xl border overflow-hidden" style={{borderColor:"rgba(6,182,212,0.2)",background:"linear-gradient(135deg,rgba(6,182,212,0.04),rgba(139,92,246,0.04))"}}>
-              <div className="p-4">
+              <div className="p-4 min-h-[80px]">
                 {introLoading ? (
-                  <div className="space-y-2">
-                    {[100, 85, 60].map((w, i) => (
-                      <div key={i} className="h-3 rounded animate-pulse bg-white/10" style={{width:`${w}%`}} />
+                  <div className="space-y-2 pt-1">
+                    {[100, 80, 55].map((w, i) => (
+                      <div key={i} className="h-3.5 rounded-full animate-pulse bg-white/8" style={{width:`${w}%`}} />
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-foreground/85 leading-relaxed">{introMsg}</p>
+                  <motion.p
+                    key={introVariant}
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="text-sm text-foreground/85 leading-relaxed"
+                  >
+                    {introMsg}
+                  </motion.p>
                 )}
               </div>
-              <div className="flex items-center gap-2 px-4 pb-3 pt-1 border-t border-white/8">
-                <button onClick={regenerateIntro}
-                  className="flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 transition-colors font-medium">
-                  <Sparkles className="h-3 w-3" /> Regenerate
+              <div className="flex items-center gap-2 px-4 pb-3 pt-2 border-t border-white/8">
+                <button onClick={regenerateIntro} disabled={introLoading}
+                  className="flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 disabled:opacity-40 transition-colors font-medium">
+                  <Sparkles className="h-3 w-3" />
+                  {introLoading ? "Generating…" : `Next variant`}
                 </button>
+                <span className="text-white/20 text-xs ml-1">{introVariant + 1}/3</span>
                 <button onClick={copyIntro}
-                  className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/8 hover:bg-white/12 text-xs font-semibold transition-colors">
+                  className="ml-auto flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all"
+                  style={introCopied
+                    ? { background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.35)", color: "#34d399" }
+                    : { background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.25)", color: "#67e8f9" }
+                  }>
                   {introCopied
-                    ? <><CheckCircle2 className="h-3 w-3 text-emerald-400" /> Copied!</>
-                    : <><Copy className="h-3 w-3" /> Copy</>
+                    ? <><CheckCircle2 className="h-3 w-3" /> Copied!</>
+                    : <><Copy className="h-3 w-3" /> Copy message</>
                   }
                 </button>
               </div>
@@ -794,15 +829,17 @@ function FilterSheet({
 
 // ── Main Swipe Page ────────────────────────────────────────────────────────────
 export default function Swipe() {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [, setLocation] = useLocation();
   const createSwipe = useCreateSwipe();
   const isTalent = user?.userType === "talent";
 
-  const { data: talentData, isLoading: isLoadingTalent, isError: isErrorTalent, refetch: refetchTalent } = useListTalent({}, { query: { enabled: !isTalent, queryKey: ["listTalent"] } });
-  const { data: startupData, isLoading: isLoadingStartups, isError: isErrorStartups, refetch: refetchStartups } = useListStartups({}, { query: { enabled: isTalent, queryKey: ["listStartups"] } });
-  useGetMyTalentProfile({ query: { enabled: isTalent, queryKey: ["myTalentProfile"] } });
-  useGetMyStartupProfile({ query: { enabled: !isTalent, queryKey: ["myStartupProfile"] } });
+  const userLoaded = !!user;
+  const { data: talentData, isLoading: isLoadingTalent, isError: isErrorTalent, refetch: refetchTalent } = useListTalent({}, { query: { enabled: userLoaded && !isTalent, queryKey: ["listTalent"] } });
+  const { data: startupData, isLoading: isLoadingStartups, isError: isErrorStartups, refetch: refetchStartups } = useListStartups({}, { query: { enabled: userLoaded && isTalent, queryKey: ["listStartups"] } });
+  const { data: myTalentProfile } = useGetMyTalentProfile({ query: { enabled: userLoaded && isTalent, queryKey: ["myTalentProfile"] } });
+  const { data: myStartupProfile } = useGetMyStartupProfile({ query: { enabled: userLoaded && !isTalent, queryKey: ["myStartupProfile"] } });
+  const myProfile = isTalent ? (myTalentProfile ?? null) : (myStartupProfile ?? null);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [matchModal, setMatchModal] = useState<{ card: any; score: number; matchId: number } | null>(null);
@@ -813,7 +850,7 @@ export default function Swipe() {
   const isDragging = useRef(false);
 
   const allCards = isTalent ? startupData?.profiles || [] : talentData?.profiles || [];
-  const isLoading = isTalent ? isLoadingStartups : isLoadingTalent;
+  const isLoading = authLoading || (userLoaded && (isTalent ? isLoadingStartups : isLoadingTalent));
   const isError = isTalent ? isErrorStartups : isErrorTalent;
   const refetch = isTalent ? refetchStartups : refetchTalent;
   const myId = user?.id ?? 1;
@@ -973,6 +1010,7 @@ export default function Swipe() {
             card={expandedCard}
             isTalent={isTalent}
             myId={myId}
+            myProfile={myProfile}
             onClose={() => setExpandedCard(null)}
             onSwipe={(dir) => { setExpandedCard(null); handleSwipe(dir); }}
           />

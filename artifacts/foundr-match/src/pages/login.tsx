@@ -2,6 +2,7 @@ import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { useLoginUser } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,6 +40,7 @@ const DEMO_PERSONAS = [
 export default function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const loginUser = useLoginUser();
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -53,6 +55,7 @@ export default function Login() {
       { data: { email, password: "password123" } },
       {
         onSuccess: (data) => {
+          queryClient.invalidateQueries({ queryKey: ["getMe"] });
           if (!data.onboardingComplete) {
             setLocation("/onboarding");
           } else {
@@ -71,6 +74,7 @@ export default function Login() {
       { data: values },
       {
         onSuccess: (data) => {
+          queryClient.invalidateQueries({ queryKey: ["getMe"] });
           toast({
             title: "Welcome back",
             description: "Successfully logged in.",
