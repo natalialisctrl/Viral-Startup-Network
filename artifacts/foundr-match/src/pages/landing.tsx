@@ -341,7 +341,7 @@ export default function Landing() {
               {[
                 {
                   icon: Zap,
-                  title: "AI-Powered Matching",
+                  title: "AI-powered compatibility matching",
                   desc: "Our model analyzes 50+ signals to surface your highest-compatibility connections first.",
                   color: "text-cyan-400",
                   bg: "rgba(6,182,212,0.1)",
@@ -349,16 +349,16 @@ export default function Landing() {
                 },
                 {
                   icon: Heart,
-                  title: "Swipe-to-Match",
-                  desc: "Tinder-style discovery meets LinkedIn depth. Swipe on potential, unlock the details.",
+                  title: "Invite-only network",
+                  desc: "Every profile is vetted. No noise — only serious founders and exceptional builders.",
                   color: "text-pink-400",
                   bg: "rgba(244,114,182,0.1)",
                   border: "rgba(244,114,182,0.2)",
                 },
                 {
                   icon: TrendingUp,
-                  title: "Traction Signals",
-                  desc: "See real momentum data — who's trending, fast-replying, and growing fast.",
+                  title: "Built for the next generation of founders",
+                  desc: "Move at startup speed. Discover, match, and connect with the people who'll define what's next.",
                   color: "text-emerald-400",
                   bg: "rgba(52,211,153,0.1)",
                   border: "rgba(52,211,153,0.2)",
