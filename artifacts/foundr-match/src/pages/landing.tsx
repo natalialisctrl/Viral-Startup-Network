@@ -277,9 +277,9 @@ export default function Landing() {
               className="mt-12 flex items-center justify-center gap-6 text-sm text-muted-foreground"
             >
               {[
-                { icon: Shield, text: "No spam, ever" },
-                { icon: Zap, text: "Match in 24h" },
-                { icon: Star, text: "Curated startups only" },
+                { icon: Zap, text: "AI-powered compatibility matching" },
+                { icon: Shield, text: "Invite-only network" },
+                { icon: Star, text: "Built for the next generation of founders" },
               ].map(({ icon: Icon, text }) => (
                 <span key={text} className="flex items-center gap-1.5">
                   <Icon className="h-3.5 w-3.5 text-cyan-400/70" />
