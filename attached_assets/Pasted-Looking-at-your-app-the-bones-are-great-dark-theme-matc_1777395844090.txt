@@ -1,0 +1,16 @@
+Looking at your app, the bones are great — dark theme, match percentage, skill tags, the swipe actions. Here's what I'd suggest prompting Replit to elevate the visual polish without changing any functionality:
+
+Prompt to give Replit:
+
+Without removing or changing any existing features, functionality, or layout structure on the Discover page, please make the following purely visual/aesthetic upgrades to the profile cards:
+
+Card background: Replace the flat dark card with a subtle glassmorphism effect — a semi-transparent dark surface with a very slight frosted blur, thin 1px border using a soft white or cyan at ~10% opacity, and a gentle inner glow.
+Match percentage badge: Give the "72% Match" pill a glowing gradient border (cyan → violet) with a soft outer glow effect to make it feel like a live signal, not a static label.
+Skill/tech tags (React, TypeScript, etc.): Style them with a subtle gradient fill (dark teal to dark purple) and a faint glowing border, so they feel like active chips rather than plain text labels.
+Avatar ring: Add a thin animated gradient ring around the profile photo (cycling through cyan, violet, and electric blue) — similar to how premium apps indicate an "active" user.
+Action buttons (Pass, Save, Like): Give each button a soft neon glow on hover/press matching their color — red glow for Pass, white/silver for Save, and a warm pulse for Like. Make the buttons feel slightly more dimensional with a glassy surface.
+Typography: Bump the name ("Alex Chen") to a slightly heavier weight with a very subtle white text glow. Make the title line (Full-Stack Engineer) use a muted cyan or lavender tone instead of plain gray.
+"Good compatibility" bar at the bottom: Add a soft animated shimmer or pulse to it so it feels like a live AI insight, not a static note.
+Trending / Fast Reply badges: Give these a more premium pill treatment — gradient backgrounds (amber→orange for Trending, electric blue→cyan for Fast Reply) with a subtle glow.
+
+Please preserve all existing spacing, layout, text content, and interactive behavior exactly as-is.

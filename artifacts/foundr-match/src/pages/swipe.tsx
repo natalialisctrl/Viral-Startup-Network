@@ -879,10 +879,12 @@ export default function Swipe() {
                 className="absolute inset-0 w-full h-full cursor-pointer select-none"
               >
                 {/* ── Card ── */}
-                <div className={`w-full h-full rounded-3xl overflow-hidden relative shadow-2xl bg-gradient-to-br ${getCardGradient(currentCard, isTalent)}`}>
+                <div className={`w-full h-full rounded-3xl overflow-hidden relative bg-gradient-to-br ${getCardGradient(currentCard, isTalent)} border border-white/[0.07]`}
+                  style={{ boxShadow: '0 8px 40px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05)' }}>
 
-                  {/* Subtle radial highlight */}
-                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_15%,rgba(255,255,255,0.07),transparent_55%)] pointer-events-none" />
+                  {/* Glassmorphism inner glow */}
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_15%,rgba(255,255,255,0.06),transparent_55%)] pointer-events-none" />
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_80%,rgba(6,182,212,0.04),transparent_50%)] pointer-events-none" />
 
                   {/* Video */}
                   {videoUrl && (
@@ -914,42 +916,60 @@ export default function Swipe() {
 
                   {/* Top-right: badges */}
                   <div className="absolute top-4 right-4 z-10 flex flex-col gap-1.5 items-end">
-                    <span className="bg-white text-black text-xs font-black px-3 py-1 rounded-full shadow-lg">
+                    {/* Match pill — glowing gradient border */}
+                    <span
+                      className="text-xs font-black px-3 py-1 rounded-full text-white"
+                      style={{
+                        background: 'linear-gradient(#090909, #090909) padding-box, linear-gradient(135deg, #06b6d4, #7c3aed) border-box',
+                        border: '1.5px solid transparent',
+                        boxShadow: '0 0 12px rgba(6,182,212,0.5), 0 0 28px rgba(124,58,237,0.25)',
+                      }}
+                    >
                       {score}% Match
                     </span>
                     {isTrending && (
-                      <span className="bg-orange-500/90 text-white text-[11px] font-semibold px-2.5 py-0.5 rounded-full">🔥 Trending</span>
+                      <span
+                        className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full text-white"
+                        style={{ background: 'linear-gradient(135deg, #b45309, #ea580c)', boxShadow: '0 0 10px rgba(234,88,12,0.45)' }}
+                      >🔥 Trending</span>
                     )}
                     {isFastReply && (
-                      <span className="bg-white/15 text-white text-[11px] font-semibold px-2.5 py-0.5 rounded-full border border-white/20">⚡ Fast Reply</span>
+                      <span
+                        className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full text-white"
+                        style={{ background: 'linear-gradient(135deg, #1d4ed8, #06b6d4)', boxShadow: '0 0 10px rgba(6,182,212,0.45)' }}
+                      >⚡ Fast Reply</span>
                     )}
                   </div>
 
-                  {/* Center: avatar / logo */}
+                  {/* Center: avatar / logo — with animated gradient ring */}
                   <div className="absolute inset-0 flex items-center justify-center" style={{ paddingBottom: '56%' }}>
                     {isTalent ? (
-                      <div className="relative">
-                        {(currentCard as any).logoUrl ? (
-                          <img src={(currentCard as any).logoUrl} alt="" className="w-24 h-24 rounded-2xl object-cover border-2 border-white/20 shadow-2xl" />
-                        ) : (
-                          <div className="w-24 h-24 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-4xl font-black text-white/90 shadow-2xl backdrop-blur-sm">
-                            {(currentCard as any).companyName?.charAt(0)}
-                          </div>
-                        )}
+                      <div className="avatar-gradient-ring-sq">
+                        <div className="bg-[#060606] rounded-[15px] p-[2px]">
+                          {(currentCard as any).logoUrl ? (
+                            <img src={(currentCard as any).logoUrl} alt="" className="w-24 h-24 rounded-2xl object-cover" />
+                          ) : (
+                            <div className="w-24 h-24 rounded-2xl bg-white/8 flex items-center justify-center text-4xl font-black text-white/90">
+                              {(currentCard as any).companyName?.charAt(0)}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     ) : (
-                      <div className="relative">
-                        {(currentCard as any).avatarUrl ? (
-                          <img
-                            src={(currentCard as any).avatarUrl}
-                            alt=""
-                            className="w-28 h-28 rounded-full object-cover border-[3px] border-white/25 shadow-2xl"
-                          />
-                        ) : (
-                          <div className="w-28 h-28 rounded-full bg-white/10 border-[3px] border-white/20 flex items-center justify-center text-5xl font-black text-white/90 shadow-2xl">
-                            {(currentCard as any).fullName?.charAt(0)}
-                          </div>
-                        )}
+                      <div className="avatar-gradient-ring">
+                        <div className="bg-[#060606] rounded-full p-[2px]">
+                          {(currentCard as any).avatarUrl ? (
+                            <img
+                              src={(currentCard as any).avatarUrl}
+                              alt=""
+                              className="w-28 h-28 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-28 h-28 rounded-full bg-white/8 flex items-center justify-center text-5xl font-black text-white/90">
+                              {(currentCard as any).fullName?.charAt(0)}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -960,7 +980,8 @@ export default function Swipe() {
                     <div className="flex items-start justify-between gap-2 mb-1">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <h2 className="text-xl font-bold text-white leading-tight truncate">
+                          <h2 className="text-xl font-extrabold text-white leading-tight truncate"
+                            style={{ textShadow: '0 0 18px rgba(255,255,255,0.22)' }}>
                             {isTalent ? (currentCard as any).companyName : (currentCard as any).fullName}
                           </h2>
                           {/* Portfolio / website link */}
@@ -981,7 +1002,7 @@ export default function Swipe() {
                             ) : null;
                           })()}
                         </div>
-                        <p className="text-white/50 text-[13px] leading-snug mt-0.5 truncate">
+                        <p className="text-[13px] leading-snug mt-0.5 truncate" style={{ color: 'rgba(167,210,255,0.5)' }}>
                           {isTalent
                             ? `${(currentCard as any).industry || "Startup"} · ${(currentCard as any).stage || "Early"}`
                             : (currentCard as any).headline}
@@ -1014,22 +1035,30 @@ export default function Swipe() {
                       );
                     })()}
 
-                    {/* Tags */}
+                    {/* Tags — gradient fill with glow */}
                     <div className="flex flex-wrap gap-1.5 mb-2.5">
                       {(isTalent
                         ? ((currentCard as any).badges ?? []).slice(0, 4)
                         : ((currentCard as any).skills ?? []).slice(0, 4)
                       ).map((tag: string, i: number) => (
-                        <span key={i} className="px-2.5 py-0.5 rounded-full bg-white/10 text-white/65 text-xs border border-white/12 backdrop-blur-sm">
+                        <span key={i} className="px-2.5 py-0.5 rounded-full text-xs"
+                          style={{
+                            background: 'linear-gradient(135deg, rgba(13,40,50,0.9), rgba(30,12,50,0.9))',
+                            border: '1px solid rgba(6,182,212,0.22)',
+                            color: 'rgba(186,230,255,0.75)',
+                            boxShadow: '0 0 6px rgba(6,182,212,0.1)',
+                          }}>
                           {tag}
                         </span>
                       ))}
                     </div>
 
-                    {/* AI insight row */}
-                    <div className="flex items-center gap-2 bg-white/6 rounded-xl px-3 py-2 border border-white/10">
-                      <Zap className="h-3 w-3 text-white/35 shrink-0" />
-                      <p className="text-[11px] text-white/45 truncate">
+                    {/* AI insight row — animated shimmer */}
+                    <div className="relative flex items-center gap-2 rounded-xl px-3 py-2 overflow-hidden"
+                      style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(6,182,212,0.12)' }}>
+                      <div className="absolute inset-0 shimmer-ai rounded-xl" />
+                      <Zap className="h-3 w-3 shrink-0 relative z-10" style={{ color: 'rgba(6,182,212,0.6)' }} />
+                      <p className="text-[11px] truncate relative z-10" style={{ color: 'rgba(186,230,255,0.45)' }}>
                         {score > 87 ? "Exceptional culture & skill alignment detected"
                           : score > 82 ? "Strong alignment across key hiring signals"
                           : "Good compatibility on core requirements"}
@@ -1051,7 +1080,15 @@ export default function Swipe() {
             onClick={() => handleSwipe("left")}
             className="flex flex-col items-center gap-1 group"
           >
-            <div className="w-[60px] h-[60px] rounded-full bg-white/6 border-2 border-red-500/40 flex items-center justify-center shadow-lg group-hover:bg-red-500/10 group-hover:border-red-500/70 transition-all">
+            <div className="w-[60px] h-[60px] rounded-full flex items-center justify-center transition-all duration-200"
+              style={{
+                background: 'rgba(255,255,255,0.05)',
+                border: '2px solid rgba(239,68,68,0.4)',
+                boxShadow: '0 0 0 rgba(239,68,68,0)',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 0 20px rgba(239,68,68,0.45), 0 0 40px rgba(239,68,68,0.15)')}
+              onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 0 0 rgba(239,68,68,0)')}
+            >
               <X className="h-6 w-6 text-red-400" strokeWidth={2.5} />
             </div>
             <span className="text-[10px] text-white/30 font-medium">Pass</span>
@@ -1063,7 +1100,14 @@ export default function Swipe() {
             onClick={() => handleSwipe("down")}
             className="flex flex-col items-center gap-1 group"
           >
-            <div className="w-[48px] h-[48px] rounded-full bg-white/5 border border-white/20 flex items-center justify-center shadow-md group-hover:bg-white/10 group-hover:border-white/40 transition-all">
+            <div className="w-[48px] h-[48px] rounded-full flex items-center justify-center transition-all duration-200"
+              style={{
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.18)',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 0 16px rgba(200,200,255,0.3)')}
+              onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}
+            >
               <Bookmark className="h-5 w-5 text-white/50" />
             </div>
             <span className="text-[10px] text-white/25 font-medium">Save</span>
@@ -1075,7 +1119,15 @@ export default function Swipe() {
             onClick={() => handleSwipe("right")}
             className="flex flex-col items-center gap-1 group"
           >
-            <div className="w-[60px] h-[60px] rounded-full bg-white border-2 border-white flex items-center justify-center shadow-xl shadow-white/15 group-hover:bg-white/90 transition-all">
+            <div className="w-[60px] h-[60px] rounded-full flex items-center justify-center transition-all duration-200"
+              style={{
+                background: 'white',
+                border: '2px solid white',
+                boxShadow: '0 0 18px rgba(255,255,255,0.25), 0 4px 16px rgba(0,0,0,0.4)',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 0 30px rgba(255,255,255,0.5), 0 0 60px rgba(255,255,255,0.2)')}
+              onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 0 18px rgba(255,255,255,0.25), 0 4px 16px rgba(0,0,0,0.4)')}
+            >
               <Heart className="h-6 w-6 text-black fill-current" strokeWidth={2} />
             </div>
             <span className="text-[10px] text-white/30 font-medium">Like</span>
