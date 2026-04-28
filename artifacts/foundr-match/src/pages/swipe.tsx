@@ -999,19 +999,17 @@ export default function Swipe() {
                       )}
                     </div>
 
-                    {/* Bio — capped at ~120 chars / 2 sentences */}
+                    {/* Bio — first 2 complete sentences */}
                     {(() => {
                       const raw = isTalent
                         ? ((currentCard as any).elevatorPitch ?? (currentCard as any).mission ?? (currentCard as any).bio)
                         : ((currentCard as any).bio ?? (currentCard as any).whyStartups);
                       if (!raw) return null;
-                      const MAX = 120;
-                      const trimmed = raw.length > MAX
-                        ? raw.slice(0, raw.lastIndexOf(" ", MAX)) + "…"
-                        : raw;
+                      const sentences = raw.match(/[^.!?]+[.!?]+/g) ?? [raw];
+                      const preview = sentences.slice(0, 2).join(" ").trim();
                       return (
                         <p className="text-white/65 text-[12.5px] leading-relaxed mb-2.5 mt-1.5">
-                          {trimmed}
+                          {preview}
                         </p>
                       );
                     })()}
