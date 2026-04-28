@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Heart, X, Star, Bookmark, Zap, MessageCircle, User, ExternalLink, MapPin, Briefcase, ChevronDown, Flame, TrendingUp, Users, SlidersHorizontal, Copy, CheckCircle2, Shield, Activity, Sparkles, Link2, Badge as LucideBadge, Radio } from "lucide-react";
+import { Heart, X, Star, Bookmark, Zap, MessageCircle, User, ExternalLink, MapPin, Briefcase, ChevronDown, Flame, TrendingUp, Users, SlidersHorizontal, Copy, CheckCircle2, Shield, Activity, Sparkles, Link2, Badge as LucideBadge, Radio, Info } from "lucide-react";
 import { useLocation } from "wouter";
 
 // ── Deterministic AI scoring ──────────────────────────────────────────────────
@@ -1326,6 +1326,18 @@ export default function Swipe() {
                         {cardReason}
                       </p>
                     </div>
+
+                    {/* Tap-to-explore hint */}
+                    <motion.div
+                      className="flex items-center justify-center gap-1.5 mt-1"
+                      animate={{ opacity: [0.45, 0.8, 0.45] }}
+                      transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      <Info className="h-3 w-3" style={{ color: 'rgba(255,255,255,0.35)' }} />
+                      <span className="text-[10px] font-medium tracking-wide" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                        Tap card for full profile &amp; AI analysis
+                      </span>
+                    </motion.div>
                   </div>
 
                 </div>
