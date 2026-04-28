@@ -926,7 +926,7 @@ export default function Swipe() {
                   </div>
 
                   {/* Center: avatar / logo */}
-                  <div className="absolute inset-0 flex items-center justify-center" style={{ paddingBottom: '46%' }}>
+                  <div className="absolute inset-0 flex items-center justify-center" style={{ paddingBottom: '56%' }}>
                     {isTalent ? (
                       <div className="relative">
                         {(currentCard as any).logoUrl ? (
@@ -955,33 +955,64 @@ export default function Swipe() {
                   </div>
 
                   {/* Bottom info overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/85 to-transparent pt-20 px-5 pb-5">
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/90 to-transparent pt-16 px-5 pb-5">
                     {/* Name + meta */}
-                    <div className="flex items-end justify-between gap-2 mb-1.5">
+                    <div className="flex items-start justify-between gap-2 mb-1">
                       <div className="min-w-0 flex-1">
-                        <h2 className="text-[22px] font-bold text-white leading-tight truncate">
-                          {isTalent ? (currentCard as any).companyName : (currentCard as any).fullName}
-                        </h2>
-                        <p className="text-white/55 text-sm leading-snug mt-0.5 truncate">
+                        <div className="flex items-center gap-2">
+                          <h2 className="text-xl font-bold text-white leading-tight truncate">
+                            {isTalent ? (currentCard as any).companyName : (currentCard as any).fullName}
+                          </h2>
+                          {/* Portfolio / website link */}
+                          {(() => {
+                            const url = isTalent
+                              ? (currentCard as any).websiteUrl
+                              : ((currentCard as any).portfolioUrl ?? (currentCard as any).linkedinUrl);
+                            return url ? (
+                              <a
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="shrink-0 p-1 rounded-full bg-white/10 border border-white/20 text-white/60 hover:bg-white/20 hover:text-white transition-all"
+                              >
+                                <ExternalLink className="h-3 w-3" />
+                              </a>
+                            ) : null;
+                          })()}
+                        </div>
+                        <p className="text-white/50 text-[13px] leading-snug mt-0.5 truncate">
                           {isTalent
                             ? `${(currentCard as any).industry || "Startup"} · ${(currentCard as any).stage || "Early"}`
                             : (currentCard as any).headline}
                         </p>
                       </div>
                       {!isTalent && (currentCard as any).yearsExperience && (
-                        <span className="shrink-0 text-white/45 text-xs bg-white/8 border border-white/12 px-2.5 py-1 rounded-full">
+                        <span className="shrink-0 text-white/40 text-xs bg-white/8 border border-white/12 px-2.5 py-1 rounded-full mt-0.5">
                           {(currentCard as any).yearsExperience}y exp
                         </span>
                       )}
                       {isTalent && (currentCard as any).teamSize && (
-                        <span className="shrink-0 text-white/45 text-xs bg-white/8 border border-white/12 px-2.5 py-1 rounded-full flex items-center gap-1">
+                        <span className="shrink-0 text-white/40 text-xs bg-white/8 border border-white/12 px-2.5 py-1 rounded-full flex items-center gap-1 mt-0.5">
                           <Users className="h-3 w-3" />{(currentCard as any).teamSize}
                         </span>
                       )}
                     </div>
 
+                    {/* Bio — 2–3 sentences */}
+                    {(() => {
+                      const bioText = isTalent
+                        ? ((currentCard as any).elevatorPitch ?? (currentCard as any).mission ?? (currentCard as any).bio)
+                        : ((currentCard as any).bio ?? (currentCard as any).whyStartups);
+                      return bioText ? (
+                        <p className="text-white/65 text-[12.5px] leading-relaxed line-clamp-3 mb-2.5 mt-1.5">
+                          {bioText}
+                        </p>
+                      ) : null;
+                    })()}
+
                     {/* Tags */}
-                    <div className="flex flex-wrap gap-1.5 mb-3">
+                    <div className="flex flex-wrap gap-1.5 mb-2.5">
                       {(isTalent
                         ? ((currentCard as any).badges ?? []).slice(0, 4)
                         : ((currentCard as any).skills ?? []).slice(0, 4)
