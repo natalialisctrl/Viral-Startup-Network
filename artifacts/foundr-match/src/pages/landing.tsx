@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { motion, useInView, useMotionValue, useSpring, animate } from "framer-motion";
 import { Rocket, Zap, Users, Sparkles, TrendingUp, Heart, Shield, Star, ArrowRight } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 function ParticleCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -138,7 +139,34 @@ const FLOAT_CARDS = [
   },
 ];
 
+const DEMO_PERSONAS = [
+  { type: "talent" as const, emoji: "🧑‍💻", title: "Job Seeker", desc: "Browse & swipe on startups" },
+  { type: "founder" as const, emoji: "🚀",   title: "Founder",    desc: "Discover top-tier talent" },
+];
+
 export default function Landing() {
+  const { toast } = useToast();
+  const [demoLoading, setDemoLoading] = useState<string | null>(null);
+
+  async function loginAs(type: "talent" | "founder") {
+    setDemoLoading(type);
+    try {
+      const base = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
+      const res = await fetch(`${base}/api/users/demo`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ type }),
+      });
+      if (!res.ok) throw new Error("Demo login failed");
+      const data = await res.json();
+      window.location.href = base + (data.onboardingComplete === false ? "/onboarding" : "/swipe");
+    } catch {
+      setDemoLoading(null);
+      toast({ variant: "destructive", title: "Demo login failed", description: "Please try again." });
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary/30">
       {/* Navbar */}
@@ -268,6 +296,40 @@ export default function Landing() {
                   Sign In
                 </button>
               </Link>
+            </motion.div>
+
+            {/* Demo Persona Picker */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.65 }}
+              className="mt-6 flex flex-col items-center gap-3"
+            >
+              <p className="text-xs font-medium text-muted-foreground/60 uppercase tracking-widest">
+                Try the demo — no signup needed
+              </p>
+              <div className="flex items-center gap-3">
+                {DEMO_PERSONAS.map((p) => (
+                  <button
+                    key={p.type}
+                    onClick={() => loginAs(p.type)}
+                    disabled={demoLoading !== null}
+                    className="flex items-center gap-2.5 px-5 py-2.5 rounded-full text-sm font-semibold transition-all disabled:opacity-50"
+                    style={{
+                      background: "rgba(255,255,255,0.05)",
+                      border: "1px solid rgba(255,255,255,0.12)",
+                      backdropFilter: "blur(8px)",
+                    }}
+                  >
+                    {demoLoading === p.type ? (
+                      <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                    ) : (
+                      <span className="text-base">{p.emoji}</span>
+                    )}
+                    <span className="text-white/80">{p.title}</span>
+                  </button>
+                ))}
+              </div>
             </motion.div>
 
             <motion.div
