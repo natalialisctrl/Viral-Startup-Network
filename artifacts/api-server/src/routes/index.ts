@@ -13,6 +13,7 @@ import subscriptionsRouter from "./subscriptions";
 import aiRouter from "./ai";
 import analyticsRouter from "./analytics";
 import profileViewsRouter from "./profile-views";
+import waitlistRouter from "./waitlist";
 
 const router: IRouter = Router();
 
@@ -30,5 +31,6 @@ router.use(subscriptionsRouter);
 router.use(aiRouter);
 router.use(analyticsRouter);
 router.use(profileViewsRouter);
+router.use(waitlistRouter);
 
 export default router;

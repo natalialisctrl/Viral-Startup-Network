@@ -9,3 +9,4 @@ export * from "./videos";
 export * from "./notifications";
 export * from "./subscriptions";
 export * from "./profile-views";
+export * from "./waitlist";

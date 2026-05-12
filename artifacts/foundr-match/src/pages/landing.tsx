@@ -1,9 +1,162 @@
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { motion, useInView, animate } from "framer-motion";
-import { Zap, Sparkles, TrendingUp, Heart, Shield, Star, ArrowRight, Quote } from "lucide-react";
+import { motion, AnimatePresence, useInView, animate } from "framer-motion";
+import { Zap, Sparkles, TrendingUp, Heart, Shield, Star, ArrowRight, Quote, X, CheckCircle2, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+// ── Waitlist Modal ─────────────────────────────────────────────────────────────
+function WaitlistModal({ onClose }: { onClose: () => void }) {
+  const { toast } = useToast();
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [persona, setPersona] = useState<"talent" | "founder" | "">("");
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState<{ position: number } | null>(null);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setLoading(true);
+    try {
+      const base = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
+      const res = await fetch(`${base}/api/waitlist`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), name: name.trim() || undefined, persona: persona || undefined }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to join");
+      setDone({ position: data.position });
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Couldn't join", description: err.message });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+      style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(14px)" }}
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.92, opacity: 0, y: 24 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.94, opacity: 0 }}
+        transition={{ type: "spring", stiffness: 320, damping: 28 }}
+        onClick={e => e.stopPropagation()}
+        className="relative w-full max-w-md rounded-3xl border border-white/12 overflow-hidden"
+        style={{ background: "rgba(10,10,10,0.97)", boxShadow: "0 0 60px rgba(6,182,212,0.12), 0 32px 64px rgba(0,0,0,0.6)" }}
+      >
+        {/* ambient glow */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-80 h-40 rounded-full"
+            style={{ background: "radial-gradient(ellipse,rgba(6,182,212,0.12),transparent 70%)", filter: "blur(30px)" }} />
+        </div>
+
+        <button onClick={onClose}
+          className="absolute top-4 right-4 p-1.5 rounded-full bg-white/8 hover:bg-white/14 transition-colors z-10">
+          <X className="h-4 w-4 text-muted-foreground" />
+        </button>
+
+        <div className="relative p-8">
+          {done ? (
+            <div className="text-center py-4 space-y-4">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto"
+                style={{ background: "rgba(6,182,212,0.12)", border: "1px solid rgba(6,182,212,0.3)" }}>
+                <CheckCircle2 className="h-8 w-8 text-cyan-400" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-black tracking-tight">You're on the list</h3>
+                <p className="text-muted-foreground mt-1.5 text-sm">
+                  You're #{done.position} — we'll email you when your spot opens.
+                </p>
+              </div>
+              <div className="pt-2 p-4 rounded-2xl text-sm text-center"
+                style={{ background: "rgba(6,182,212,0.06)", border: "1px solid rgba(6,182,212,0.18)", color: "rgba(103,232,249,0.8)" }}>
+                Want in faster? Try the demo now — no account needed.
+              </div>
+              <button onClick={onClose}
+                className="w-full h-12 rounded-xl font-semibold text-sm"
+                style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)" }}>
+                Done
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="mb-7">
+                <h3 className="text-2xl font-black tracking-tight">Join the waitlist</h3>
+                <p className="text-muted-foreground text-sm mt-1.5">
+                  Drop your email and we'll ping you when your spot is ready.
+                </p>
+              </div>
+
+              <form onSubmit={submit} className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Your name (optional)"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  className="w-full h-12 rounded-xl px-4 text-sm outline-none transition-colors"
+                  style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", color: "inherit" }}
+                  onFocus={e => (e.target.style.borderColor = "rgba(6,182,212,0.5)")}
+                  onBlur={e => (e.target.style.borderColor = "rgba(255,255,255,0.12)")}
+                />
+                <input
+                  type="email"
+                  required
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  className="w-full h-12 rounded-xl px-4 text-sm outline-none transition-colors"
+                  style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", color: "inherit" }}
+                  onFocus={e => (e.target.style.borderColor = "rgba(6,182,212,0.5)")}
+                  onBlur={e => (e.target.style.borderColor = "rgba(255,255,255,0.12)")}
+                />
+
+                <div className="space-y-2">
+                  <p className="text-xs text-muted-foreground font-medium">I am a…</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {(["talent", "founder"] as const).map(p => (
+                      <button
+                        key={p} type="button"
+                        onClick={() => setPersona(prev => prev === p ? "" : p)}
+                        className="h-10 rounded-xl text-sm font-semibold transition-all"
+                        style={persona === p
+                          ? { background: "rgba(6,182,212,0.15)", border: "1px solid rgba(6,182,212,0.45)", color: "#67e8f9" }
+                          : { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.10)", color: "rgba(255,255,255,0.55)" }}
+                      >
+                        {p === "talent" ? "🧑‍💻 Job Seeker" : "🚀 Founder"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading || !email.trim()}
+                  className="w-full h-12 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50 neon-cta"
+                  style={{ background: "#ffffff", color: "#000000" }}
+                >
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                  {loading ? "Joining…" : "Join Waitlist"}
+                </button>
+              </form>
+
+              <p className="text-center text-xs text-muted-foreground/50 mt-4">
+                No spam. We'll only reach out when your spot opens.
+              </p>
+            </>
+          )}
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
 
 function ParticleCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -147,6 +300,7 @@ const DEMO_PERSONAS = [
 export default function Landing() {
   const { toast } = useToast();
   const [demoLoading, setDemoLoading] = useState<string | null>(null);
+  const [showWaitlist, setShowWaitlist] = useState(false);
 
   async function loginAs(type: "talent" | "founder") {
     setDemoLoading(type);
@@ -181,13 +335,12 @@ export default function Landing() {
             <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Log in
             </Link>
-            <Link href="/register">
-              <button
-                className="rounded-full px-6 py-2 text-sm font-semibold bg-white text-black transition-all neon-cta hover:bg-white/90"
-              >
-                Join Waitlist
-              </button>
-            </Link>
+            <button
+              onClick={() => setShowWaitlist(true)}
+              className="rounded-full px-6 py-2 text-sm font-semibold bg-white text-black transition-all neon-cta hover:bg-white/90"
+            >
+              Join Waitlist
+            </button>
           </nav>
         </div>
       </header>
@@ -292,13 +445,12 @@ export default function Landing() {
               transition={{ duration: 0.5, delay: 0.3 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4"
             >
-              <Link href="/register">
-                <button
-                  className="rounded-full px-10 h-14 text-lg font-bold bg-white text-black hover:bg-white/90 transition-all w-full sm:w-auto neon-cta"
-                >
-                  Find Your Match
-                </button>
-              </Link>
+              <button
+                onClick={() => setShowWaitlist(true)}
+                className="rounded-full px-10 h-14 text-lg font-bold bg-white text-black hover:bg-white/90 transition-all w-full sm:w-auto neon-cta"
+              >
+                Find Your Match
+              </button>
               <Link href="/login">
                 <button className="rounded-full px-10 h-14 text-lg font-semibold border border-white/15 bg-white/5 hover:bg-white/10 backdrop-blur-sm w-full sm:w-auto transition-all text-foreground">
                   Sign In
@@ -563,15 +715,20 @@ export default function Landing() {
               <p className="text-muted-foreground mb-8">
                 Join thousands of founders and builders who've already made the leap.
               </p>
-              <Link href="/register">
-                <button className="inline-flex items-center gap-2 rounded-full px-10 h-14 text-lg font-bold bg-white text-black hover:bg-white/90 transition-all neon-cta">
-                  Get Started Free <ArrowRight className="h-5 w-5" />
-                </button>
-              </Link>
+              <button
+                onClick={() => setShowWaitlist(true)}
+                className="inline-flex items-center gap-2 rounded-full px-10 h-14 text-lg font-bold bg-white text-black hover:bg-white/90 transition-all neon-cta"
+              >
+                Get Started Free <ArrowRight className="h-5 w-5" />
+              </button>
             </motion.div>
           </div>
         </section>
       </main>
+
+      <AnimatePresence>
+        {showWaitlist && <WaitlistModal onClose={() => setShowWaitlist(false)} />}
+      </AnimatePresence>
 
       <footer className="border-t border-white/[0.07] py-10"
         style={{ background: "rgba(255,255,255,0.012)" }}>
