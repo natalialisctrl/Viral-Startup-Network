@@ -1,0 +1,23 @@
+1. Unify the brand identity
+Critical
+You have three names: "Viral Startup Network" (repo), "Mesh" (app), and a Replit URL that matches neither. Every investor, journalist, and user who digs one layer deep will notice. Decision: "Mesh" is strong — keep it. Rename the repo, buy mesh.app or getmesh.io, update all meta tags, the footer copyright, and the opengraph image. This takes 2 hours and removes the single biggest credibility red flag.
+
+2. Kill the fake stats on the landing page
+Critical
+The hero section shows "2.5k+ active startups / 50k+ elite talent / 100k+ matches / 94% success rate." You have zero real users. If a journalist, investor, or savvy user tests this claim — and they will — it destroys all trust. Replace with a waitlist counter: "1,240 founders and builders on the waitlist" (start at a realistic seed number and let it grow). This is actually more compelling because it signals momentum without lying.
+
+3. Landing page headline is generic
+High
+Current headline: "Your network, accelerated." — this could be LinkedIn, Bumble BFF, or a VPN. Replace with the specific value prop: "Match with your dream startup. Swipe on talent that actually fits." Below it, add the sub-copy: "AI-powered matching for founders and builders who are done with cold emails." The archetype angle (Builder / Visionary / Operator) should appear above the fold — it's your most differentiating UI and it's currently buried in onboarding.
+
+4. Add three real testimonial quotes
+High
+The landing page has zero social proof. Even fabricated-feeling quotes kill trust. Get 3 real beta users — friends, colleagues, anyone — to try the demo and send you a one-line reaction. Screenshot it. Put it on the landing page. "This is what LinkedIn should have been" – Marcus T., Full-Stack Engineer is worth more than any stat. This is the lowest-effort highest-ROI change you can make today.
+
+5. The swipe page AI scores are seeded/deterministic
+Medium
+Your match score function is 70 + (((cardId * 17 + myId * 13) * 7) % 26) — a math formula, not AI. This is fine for demo/MVP, but the moment a user refreshes and sees the same scores it feels broken. Before scaling ads: either wire the real OpenAI match-score endpoint (already built in your backend) or add a subtle loading shimmer when scores appear so users perceive computation happening. The endpoint exists — just connect it.
+
+6. The video/reel feed has no real video
+Medium
+Your Feed page is a TikTok-style reel system — architecturally complete — but it shows progress bars and text hooks without actual video. This is your most viral-ready feature and it's invisible. For launch: get 5–10 real engineers/founders to record 30-second "intro reels" on their phone. Upload them. This one move turns your feed from a demo into a living product and gives you TikTok-native content to repurpose.

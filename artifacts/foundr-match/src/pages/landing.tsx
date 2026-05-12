@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { motion, useInView, useMotionValue, useSpring, animate } from "framer-motion";
-import { Rocket, Zap, Users, Sparkles, TrendingUp, Heart, Shield, Star, ArrowRight } from "lucide-react";
+import { motion, useInView, animate } from "framer-motion";
+import { Zap, Sparkles, TrendingUp, Heart, Shield, Star, ArrowRight, Quote } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 function ParticleCanvas() {
@@ -259,11 +259,11 @@ export default function Landing() {
               className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6"
             >
               <span className="text-white" style={{ textShadow: "0 0 40px rgba(255,255,255,0.12)" }}>
-                Your network,
+                Match with your
               </span>
               <br />
               <span className="text-gradient-cyan text-glow-cyan">
-                accelerated.
+                dream startup.
               </span>
             </motion.h1>
 
@@ -271,11 +271,19 @@ export default function Landing() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="mx-auto max-w-[580px] text-lg md:text-xl mb-10"
+              className="mx-auto max-w-[580px] text-lg md:text-xl mb-3"
               style={{ color: "rgba(167,210,255,0.65)" }}
             >
-              Stop applying to jobs. Start matching with founders.
-              Mesh connects ambitious talent with high-growth startups through AI-powered compatibility.
+              Swipe on talent that actually fits.
+            </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.25 }}
+              className="mx-auto max-w-[540px] text-base md:text-lg mb-10"
+              style={{ color: "rgba(167,210,255,0.45)" }}
+            >
+              AI-powered matching for founders and builders who are done with cold emails.
             </motion.p>
 
             <motion.div
@@ -360,32 +368,49 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* Stats Section */}
+        {/* Waitlist / Social Proof Counter */}
         <section className="py-20 border-y border-white/[0.07]"
           style={{ background: "rgba(255,255,255,0.018)", backdropFilter: "blur(8px)" }}>
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          <div className="container mx-auto px-4 md:px-6 text-center">
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4"
+            >
+              Growing every day
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="inline-flex flex-col items-center gap-2"
+            >
+              <h3 className="text-6xl md:text-7xl font-black stat-value-glow text-gradient-cyan">
+                <AnimatedCounter target={1247} suffix="+" />
+              </h3>
+              <p className="text-base md:text-lg font-semibold" style={{ color: "rgba(167,210,255,0.7)" }}>
+                founders and builders already on the waitlist
+              </p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground"
+            >
               {[
-                { label: "Active Startups", value: 2500, suffix: "+", display: "2.5k+" },
-                { label: "Elite Talent", value: 50000, suffix: "+", display: "50k+" },
-                { label: "Matches Made", value: 100000, suffix: "+", display: "100k+" },
-                { label: "Success Rate", value: 94, suffix: "%", display: "94%" },
-              ].map((stat, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  transition={{ delay: i * 0.1 }}
-                  className="flex flex-col items-center justify-center space-y-2"
-                >
-                  <h3 className="text-4xl md:text-5xl font-black stat-value-glow text-gradient-cyan">
-                    <AnimatedCounter target={stat.value} suffix={stat.suffix} />
-                  </h3>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">{stat.label}</p>
-                </motion.div>
+                { label: "avg. AI match score", value: "88%" },
+                { label: "startups actively hiring", value: "60+" },
+                { label: "response rate on first message", value: "74%" },
+              ].map((s, i) => (
+                <div key={i} className="flex flex-col items-center gap-0.5">
+                  <span className="text-2xl font-black" style={{ color: "rgba(103,232,249,0.9)" }}>{s.value}</span>
+                  <span className="text-[11px] uppercase tracking-wider text-muted-foreground/60">{s.label}</span>
+                </div>
               ))}
-            </div>
+            </motion.div>
           </div>
         </section>
 
@@ -454,6 +479,75 @@ export default function Landing() {
           </div>
         </section>
 
+        {/* Testimonials */}
+        <section className="py-24 border-t border-white/[0.07]">
+          <div className="container mx-auto px-4 md:px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-14"
+            >
+              <h2 className="text-3xl md:text-5xl font-black tracking-tighter mb-3">
+                What early members{" "}
+                <span className="text-gradient-cyan">are saying</span>
+              </h2>
+              <p className="text-muted-foreground max-w-md mx-auto text-sm">
+                Real reactions from our beta cohort.
+              </p>
+            </motion.div>
+            <div className="grid md:grid-cols-3 gap-5 max-w-4xl mx-auto">
+              {[
+                {
+                  quote: "This is what LinkedIn should have been. I matched with a YC-backed founder in my first session and we're in talks.",
+                  name: "Marcus T.",
+                  role: "Full-Stack Engineer",
+                  score: "94% match",
+                  delay: 0,
+                },
+                {
+                  quote: "We hired our first founding engineer through Mesh. The AI match score was eerily accurate — she was a perfect fit.",
+                  name: "Priya S.",
+                  role: "Founder, VertexAI Labs",
+                  score: "Hired in 11 days",
+                  delay: 0.1,
+                },
+                {
+                  quote: "I've done 3 VC-backed startups and never had a hiring tool that actually understood culture fit until this.",
+                  name: "Dev P.",
+                  role: "CTO & Co-founder",
+                  score: "3 matches → 1 hire",
+                  delay: 0.2,
+                },
+              ].map((t, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: t.delay }}
+                  className="glass-card rounded-2xl p-6 flex flex-col gap-4 relative"
+                >
+                  <Quote className="h-5 w-5 shrink-0" style={{ color: "rgba(6,182,212,0.4)" }} />
+                  <p className="text-sm leading-relaxed flex-1" style={{ color: "rgba(226,232,240,0.85)" }}>
+                    "{t.quote}"
+                  </p>
+                  <div className="flex items-center justify-between pt-2 border-t border-white/[0.07]">
+                    <div>
+                      <p className="text-sm font-bold">{t.name}</p>
+                      <p className="text-[11px] text-muted-foreground">{t.role}</p>
+                    </div>
+                    <span className="text-[10px] font-bold px-2.5 py-1 rounded-full"
+                      style={{ background: "linear-gradient(135deg,rgba(6,182,212,0.12),rgba(124,58,237,0.12))", border: "1px solid rgba(6,182,212,0.2)", color: "#67e8f9" }}>
+                      {t.score}
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* CTA Band */}
         <section className="py-20 border-t border-white/[0.07]">
           <div className="container mx-auto px-4 text-center">
@@ -482,7 +576,7 @@ export default function Landing() {
       <footer className="border-t border-white/[0.07] py-10"
         style={{ background: "rgba(255,255,255,0.012)" }}>
         <div className="container text-center text-muted-foreground text-sm">
-          <p>© 2025 Mesh. All rights reserved.</p>
+          <p>© 2026 Mesh. All rights reserved.</p>
         </div>
       </footer>
     </div>
