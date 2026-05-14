@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Link } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useLoginUser } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -23,22 +25,24 @@ const loginSchema = z.object({
 
 const DEMO_PERSONAS = [
   {
-    email: "demo@talent.com",
+    type: "talent" as const,
     emoji: "🧑‍💻",
     title: "Job Seeker",
     desc: "Browse startups & apply",
   },
   {
-    email: "demo@founder.com",
+    type: "founder" as const,
     emoji: "🚀",
     title: "Founder",
     desc: "Hire world-class talent",
   },
-] as const;
+];
 
 export default function Login() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const loginUser = useLoginUser();
+  const [demoLoading, setDemoLoading] = useState<string | null>(null);
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -47,19 +51,24 @@ export default function Login() {
     },
   });
 
-  function loginAs(email: string) {
-    loginUser.mutate(
-      { data: { email, password: "password123" } },
-      {
-        onSuccess: (data) => {
-          const base = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
-          window.location.href = base + (data.onboardingComplete === false ? "/onboarding" : "/swipe");
-        },
-        onError: () => {
-          toast({ variant: "destructive", title: "Demo login failed", description: "Please try again." });
-        },
-      }
-    );
+  async function loginAs(type: "talent" | "founder") {
+    setDemoLoading(type);
+    try {
+      const base = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
+      const res = await fetch(`${base}/api/users/demo`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ type }),
+      });
+      if (!res.ok) throw new Error("Demo login failed");
+      await queryClient.refetchQueries({ queryKey: ["getMe"] });
+      window.location.href = base + "/swipe";
+    } catch {
+      toast({ variant: "destructive", title: "Demo login failed", description: "Please try again." });
+    } finally {
+      setDemoLoading(null);
+    }
   }
 
   function onSubmit(values: z.infer<typeof loginSchema>) {
@@ -105,10 +114,10 @@ export default function Login() {
           <div className="grid grid-cols-2 gap-3">
             {DEMO_PERSONAS.map((persona) => (
               <button
-                key={persona.email}
+                key={persona.type}
                 type="button"
-                onClick={() => loginAs(persona.email)}
-                disabled={loginUser.isPending}
+                onClick={() => loginAs(persona.type)}
+                disabled={demoLoading !== null || loginUser.isPending}
                 className="flex flex-col items-center gap-1.5 py-4 px-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/25 active:scale-95 transition-all disabled:opacity-50 group"
               >
                 <span className="text-2xl">{persona.emoji}</span>
