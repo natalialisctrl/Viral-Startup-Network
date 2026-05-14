@@ -2,9 +2,9 @@ import { useState } from "react";
 import { AppLayout } from "@/components/layout";
 import { useAuth } from "@/context/AuthContext";
 import { useListMatches, getListMatchesQueryKey } from "@workspace/api-client-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { formatDistanceToNow } from "date-fns";
-import { Layers, Zap, MessageSquare, ChevronRight, Sparkles } from "lucide-react";
+import { Layers, Zap, MessageSquare, ChevronRight, Sparkles, Send } from "lucide-react";
 import { motion } from "framer-motion";
 
 function getAiScore(cardId: number, myId: number): number {
@@ -56,12 +56,25 @@ function ScoreRing({ score, size = 56 }: { score: number; size?: number }) {
 
 export default function Matches() {
   const { user } = useAuth();
+  const [, setLocation] = useLocation();
   const { data: matchesData, isLoading } = useListMatches({
     query: { queryKey: getListMatchesQueryKey() }
   });
 
-  const matches = matchesData?.matches || [];
+  const rawMatches = matchesData?.matches || [];
+  // Sort: NEW (no messages yet) always first, then by recency
+  const matches = [...rawMatches].sort((a, b) => {
+    const aNew = !a.lastMessageAt;
+    const bNew = !b.lastMessageAt;
+    if (aNew && !bNew) return -1;
+    if (!aNew && bNew) return 1;
+    if (a.lastMessageAt && b.lastMessageAt) {
+      return new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime();
+    }
+    return 0;
+  });
   const isTalent = user?.userType === "talent";
+  const newMatchCount = matches.filter(m => !m.lastMessageAt).length;
 
   if (isLoading) {
     return (
@@ -84,7 +97,7 @@ export default function Matches() {
         <div className="px-5 pt-8 pb-5 flex items-end justify-between">
           <div>
             <h1 className="text-2xl font-black tracking-tight" style={{ textShadow: "0 0 20px rgba(255,255,255,0.12)" }}>
-              Connections
+              Your Matches
             </h1>
             <p className="text-sm mt-0.5" style={{ color: "rgba(103,232,249,0.6)" }}>
               {isTalent ? "Startups that want to meet you" : "Talent that matched with you"}
@@ -105,6 +118,29 @@ export default function Matches() {
           )}
         </div>
 
+        {/* New matches banner */}
+        {newMatchCount > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mx-4 mb-4 flex items-center gap-3 px-4 py-3 rounded-2xl"
+            style={{
+              background: "rgba(6,182,212,0.08)",
+              border: "1px solid rgba(6,182,212,0.25)",
+              boxShadow: "0 0 20px rgba(6,182,212,0.1)",
+            }}
+          >
+            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shrink-0 nav-active-dot" />
+            <p className="text-sm font-semibold flex-1" style={{ color: "rgba(103,232,249,0.9)" }}>
+              You have <span className="font-black">{newMatchCount}</span> new match{newMatchCount !== 1 ? "es" : ""} waiting
+            </p>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+              style={{ background: "rgba(6,182,212,0.18)", border: "1px solid rgba(6,182,212,0.3)", color: "#67e8f9" }}>
+              Say hi!
+            </span>
+          </motion.div>
+        )}
+
         {/* Empty state */}
         {matches.length === 0 ? (
           <div className="mx-4 mt-4 rounded-3xl p-10 text-center glass-card">
@@ -112,7 +148,7 @@ export default function Matches() {
               style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
               <img src="/mesh-logo.png" alt="Mesh" className="h-8 w-8 rounded-lg object-cover opacity-40" />
             </div>
-            <h2 className="text-xl font-bold mb-2">No connections yet</h2>
+            <h2 className="text-xl font-bold mb-2">No matches yet</h2>
             <p className="text-muted-foreground text-sm mb-6 max-w-xs mx-auto leading-relaxed">
               {isTalent
                 ? "Swipe right on startups you're excited about — when they like you back, you'll appear here."
@@ -224,7 +260,20 @@ export default function Matches() {
                         </p>
                       </div>
 
-                      <ChevronRight className="h-4 w-4 text-muted-foreground/25 group-hover:text-muted-foreground/60 transition-colors shrink-0" />
+                      <div className="flex flex-col items-center gap-1 shrink-0">
+                        <button
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setLocation(`/chat/${match.id}`); }}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all"
+                          style={{
+                            background: isNew ? "rgba(6,182,212,0.15)" : "rgba(255,255,255,0.05)",
+                            border: isNew ? "1px solid rgba(6,182,212,0.35)" : "1px solid rgba(255,255,255,0.1)",
+                            color: isNew ? "#67e8f9" : "rgba(255,255,255,0.5)",
+                          }}
+                        >
+                          <Send className="h-3 w-3" />
+                          Chat
+                        </button>
+                      </div>
                     </div>
                   </Link>
                 </motion.div>

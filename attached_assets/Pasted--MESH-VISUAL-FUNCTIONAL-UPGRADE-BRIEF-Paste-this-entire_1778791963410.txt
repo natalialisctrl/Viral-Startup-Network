@@ -1,0 +1,64 @@
+
+    # MESH — VISUAL + FUNCTIONAL UPGRADE BRIEF
+# Paste this entire prompt to elevate the app from demo to investor-ready.
+
+
+I need you to make the following specific upgrades to the Mesh app. Please implement ALL of them in order. Do not skip any item.
+
+## 1. BRAND UNIFICATION
+- Update the app title in index.html and all meta tags to "Mesh"
+- Replace the mesh-logo.png reference with an inline SVG of the current logo (two stick figures forming an M)
+- Update the footer copyright from "2025" to "2025 Mesh" 
+- Remove all references to "Viral Startup Network" in any visible UI text
+
+## 2. LANDING PAGE — ABOVE THE FOLD
+- Change the hero headline from "Your network, accelerated" to:
+  "Match with your dream startup. Swipe on talent that actually fits."
+- Change the sub-headline to:
+  "AI-powered matching for founders and builders who are done with cold emails."
+- Move the archetype labels (Builder, Visionary, Operator, Rainmaker, Craftsman) into a visual row ABOVE the CTA buttons — show them as animated pills with their emojis
+- Replace the fake stats section (2.5k startups, 50k talent, etc.) with a live waitlist counter component that reads from a /api/waitlist-count endpoint and displays: "[N] founders and builders on the waitlist"
+- Add a horizontal strip of 3 testimonial quote cards below the stats — use placeholder names and one-line quotes that feel authentic
+
+## 3. SWIPE / DISCOVER PAGE
+- Add a subtle entrance animation (fade up, 0.3s delay per element) to the profile card on load
+- Replace the current avatar placeholder (letter initial) with a generated gradient avatar that uses the user's name to deterministically pick a color pair — make it feel premium, not like a placeholder
+- Add a "🔥 Hot Match" banner overlay on cards where the AI score is above 88%
+- Make the bottom action buttons (Pass, Save, Like) larger and more tactile — increase size by 20%, add a satisfying scale-down animation on press
+- When the user swipes right (likes), show a full-screen "It's a Match!" celebration overlay with a particle burst animation that uses the brand cyan and violet colors — auto-dismiss after 2.5 seconds
+- Add keyboard shortcuts: left arrow = pass, right arrow = like, up arrow = super like
+
+## 4. CONNECTIONS / MATCHES PAGE
+- Rename the page header from "Connections" to "Your Matches" 
+- Add a banner at the top when there are new unread matches: "You have [N] new matches waiting" with a pulsing cyan dot
+- Add a "Start Conversation" button directly on each match card (not just on the detail view) — it should open the chat with a pre-filled intro message template
+- Sort matches so "NEW" ones always appear first, then by recency
+
+## 5. FEED PAGE
+- Add a "Start Your Reel" CTA button at the top of the feed (for talent users) that links to an upload prompt — even if upload isn't fully functional yet, show the UI so investors can see the vision
+- Make the reel card engagement numbers (views, likes) formatted with k/M suffixes if over 1000
+- Add a "Trending" section at the top showing the 3 most-viewed reels this week
+
+## 6. DASHBOARD
+- Make the "Your Founder Insights" / "AI Insights" panel more visually prominent — give it a glowing cyan border animation (subtle pulse) to draw the eye
+- Add a "Complete Your Profile" progress bar at the top if profile strength is below 80% — show exactly what's missing as clickable chips
+- Add a "Share a Match" floating action button in the bottom right corner that triggers the native share API with pre-filled text: "Just matched on Mesh 🚀 getmesh.io"
+
+## 7. OVERALL VISUAL POLISH
+- Replace ALL instances of letter-initial avatar placeholders with the gradient avatar system described in item 3
+- Add a subtle grain texture overlay to the main background (opacity 0.025) — this makes the dark background feel premium rather than flat
+- Ensure all page transitions use a consistent fade (opacity 0 to 1, 200ms) — remove any jarring instant transitions
+- Add a subtle "Powered by Mesh AI" label to all AI-generated content (match scores, insights, compatibility reasons)
+- On the nav/sidebar, add animated notification dots that pulse when there are new matches or messages
+
+## 8. DEMO MODE IMPROVEMENTS
+- On the landing page, add a "Watch a demo" button that opens a modal showing a 30-second animated walkthrough of the core swipe → match → chat flow (can be a CSS animation or gif)
+- Make the demo login buttons more prominent — frame them as "Try as Engineer" and "Try as Founder" with their respective emojis
+- After demo login, show a one-time tooltip tour highlighting the 3 key features: Discover, Feed, and AI Match Score
+
+## 9. INVESTOR-SPECIFIC ADDITIONS
+- Add a /pitch route (not in main nav) that renders a minimal one-page investor brief showing: what Mesh does, the market size, the business model, and current traction metrics
+- On the dashboard, add a small "Share Mesh" card that generates a referral link for the current user
+
+Please implement all of the above changes, test that the app loads correctly, and confirm each item is complete.
+  

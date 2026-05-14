@@ -3,9 +3,11 @@ import { AppLayout } from "@/components/layout";
 import { useGetMyStats, useGetMyTalentProfile, useGetMyStartupProfile, getGetMyStatsQueryKey, getGetMyTalentProfileQueryKey, getGetMyStartupProfileQueryKey } from "@workspace/api-client-react";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Zap, Eye, MessageSquare, Flame, TrendingUp, Brain, Users, Share2, ArrowRight, Sparkles, Radio } from "lucide-react";
+import { Zap, Eye, MessageSquare, Flame, TrendingUp, Brain, Users, Share2, ArrowRight, Sparkles, Radio, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 
 const HOT_PROFILES_TALENT = [
   { id: 1,  name: "Zara K.",    role: "AI/ML Engineer",        score: 94, archetype: "ML Engineer",        cls: "text-cyan-300 border-cyan-500/35 bg-cyan-500/10" },
@@ -39,6 +41,8 @@ async function fetchCareerInsights() {
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const isTalent = user?.userType === "talent";
 
   const { data: stats, isLoading: statsLoading } = useGetMyStats({ query: { queryKey: getGetMyStatsQueryKey() } });
@@ -80,17 +84,74 @@ export default function Dashboard() {
   const hotProfiles = isTalent ? HOT_PROFILES_STARTUP : HOT_PROFILES_TALENT;
 
   const shareMatch = () => {
-    const text = "I just matched with a startup on Mesh 🚀 Your network, accelerated.";
+    const text = isTalent
+      ? "Just matched on Mesh 🚀 getmesh.io"
+      : "Just found exceptional talent on Mesh 🚀 getmesh.io";
     if (navigator.share) {
-      navigator.share({ text, url: window.location.origin }).catch(() => {});
+      navigator.share({ text, url: "https://getmesh.io" }).catch(() => {});
     } else {
-      navigator.clipboard.writeText(text).then(() => alert("Copied!")).catch(() => {});
+      navigator.clipboard.writeText(text + " — https://getmesh.io").then(() =>
+        toast({ title: "Copied to clipboard!", description: "Share it with your network." })
+      ).catch(() => {});
     }
   };
 
+  // Profile completion chips for talent
+  const talentMissingFields = isTalent && talentProfile ? [
+    !talentProfile.bio && { label: "Add Bio", href: "/my-profile" },
+    !(talentProfile.skills?.length) && { label: "Add Skills", href: "/my-profile" },
+    !talentProfile.linkedinUrl && { label: "Link LinkedIn", href: "/my-profile" },
+    !talentProfile.portfolioUrl && { label: "Add Portfolio", href: "/my-profile" },
+    !talentProfile.city && { label: "Add Location", href: "/my-profile" },
+  ].filter(Boolean) as { label: string; href: string }[] : [];
+
   return (
     <AppLayout>
-      <div className="p-5 max-w-4xl mx-auto space-y-6 pb-28 md:pb-8">
+      <div className="p-5 max-w-4xl mx-auto space-y-6 pb-28 md:pb-8 relative">
+
+        {/* Profile completion bar */}
+        {score > 0 && score < 80 && (
+          <motion.div
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-2xl p-4"
+            style={{
+              background: "rgba(251,191,36,0.06)",
+              border: "1px solid rgba(251,191,36,0.2)",
+              boxShadow: "0 0 20px rgba(251,191,36,0.08)",
+            }}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm font-bold" style={{ color: "rgba(251,191,36,0.9)" }}>
+                Complete Your Profile — {score}%
+              </p>
+              <span className="text-[10px] font-semibold text-muted-foreground">{100 - score}% to go</span>
+            </div>
+            <div className="h-1.5 rounded-full bg-white/8 overflow-hidden mb-3">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${score}%` }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="h-full rounded-full"
+                style={{ background: "linear-gradient(90deg,#fbbf24,#f59e0b)" }}
+              />
+            </div>
+            {talentMissingFields.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {talentMissingFields.map((f) => (
+                  <button
+                    key={f.label}
+                    onClick={() => setLocation(f.href)}
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all hover:bg-amber-400/10"
+                    style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.2)", color: "rgba(251,191,36,0.8)" }}
+                  >
+                    + {f.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </motion.div>
+        )}
 
         {/* Header */}
         <motion.div
@@ -482,6 +543,25 @@ export default function Dashboard() {
         </div>
 
       </div>
+
+      {/* Floating Share FAB */}
+      <motion.button
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.8, type: "spring", stiffness: 300, damping: 20 }}
+        onClick={shareMatch}
+        className="fixed bottom-24 md:bottom-8 right-5 z-50 flex items-center gap-2 px-4 py-3 rounded-2xl font-bold text-sm shadow-2xl transition-all hover:scale-105 active:scale-95"
+        style={{
+          background: "linear-gradient(135deg,rgba(6,182,212,0.25),rgba(124,58,237,0.25))",
+          border: "1px solid rgba(6,182,212,0.4)",
+          boxShadow: "0 0 30px rgba(6,182,212,0.25), 0 8px 32px rgba(0,0,0,0.4)",
+          color: "#67e8f9",
+          backdropFilter: "blur(16px)",
+        }}
+      >
+        <Share2 className="h-4 w-4" />
+        Share Match
+      </motion.button>
     </AppLayout>
   );
 }

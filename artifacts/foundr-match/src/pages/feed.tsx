@@ -522,22 +522,80 @@ export default function Feed() {
     );
   }
 
+  // Trending: top 3 by views (founders see talent reels)
+  const trendingItems = !isTalent
+    ? [...talentProfiles]
+        .sort((a, b) => getReelStats(b.id).views - getReelStats(a.id).views)
+        .slice(0, 3)
+    : [];
+
   return (
     <AppLayout>
       {/* Sticky header */}
-      <div className="sticky top-0 z-10 flex items-center justify-center gap-3 py-2.5 border-b border-white/[0.06]"
+      <div className="sticky top-0 z-10 border-b border-white/[0.06]"
         style={{ background: "rgba(4,4,4,0.88)", backdropFilter: "blur(16px)" }}>
-        <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase"
-          style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)", color: "rgba(252,165,165,0.8)" }}>
-          <span className="w-1.5 h-1.5 rounded-full bg-red-400 live-dot" />
-          LIVE
-        </span>
-        <span className="section-header-gradient text-sm font-bold">
-          {isTalent ? "Startup Pitches" : "Talent Reels"}
-        </span>
-        <span className="text-white/25 text-xs">
-          {isTalent ? `${videos.length} pitches` : `${talentProfiles.length} reels`}
-        </span>
+        <div className="flex items-center justify-center gap-3 py-2.5">
+          <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase"
+            style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)", color: "rgba(252,165,165,0.8)" }}>
+            <span className="w-1.5 h-1.5 rounded-full bg-red-400 live-dot" />
+            LIVE
+          </span>
+          <span className="section-header-gradient text-sm font-bold">
+            {isTalent ? "Startup Pitches" : "Talent Reels"}
+          </span>
+          <span className="text-white/25 text-xs">
+            {isTalent ? `${videos.length} pitches` : `${talentProfiles.length} reels`}
+          </span>
+        </div>
+
+        {/* Start Your Reel CTA — talent only */}
+        {isTalent && (
+          <div className="px-4 pb-2.5 flex items-center gap-3">
+            <div className="flex-1 h-px bg-white/[0.06]" />
+            <button
+              onClick={() => alert("Reel recording coming soon! Your profile video will appear in founders' feeds.")}
+              className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold transition-all"
+              style={{
+                background: "linear-gradient(135deg,rgba(6,182,212,0.18),rgba(124,58,237,0.18))",
+                border: "1px solid rgba(6,182,212,0.3)",
+                color: "#67e8f9",
+                boxShadow: "0 0 14px rgba(6,182,212,0.12)",
+              }}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-red-400 live-dot" />
+              Start Your Reel
+            </button>
+            <div className="flex-1 h-px bg-white/[0.06]" />
+          </div>
+        )}
+
+        {/* Trending strip — founders only */}
+        {!isTalent && trendingItems.length > 0 && (
+          <div className="px-4 pb-2.5">
+            <div className="flex items-center gap-1.5 mb-2">
+              <TrendingUp className="h-3 w-3 text-orange-400" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-orange-400/80">Trending This Week</span>
+            </div>
+            <div className="flex gap-2">
+              {trendingItems.map((p, i) => {
+                const stats = getReelStats(p.id);
+                return (
+                  <div key={p.id} className="flex items-center gap-2 px-3 py-1.5 rounded-xl shrink-0"
+                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                    <span className="text-[9px] font-black text-orange-400">#{i + 1}</span>
+                    <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[9px] font-black">
+                      {p.fullName?.charAt(0)}
+                    </div>
+                    <span className="text-[11px] font-semibold truncate max-w-[80px]">{p.fullName?.split(" ")[0]}</span>
+                    <span className="text-[10px] text-white/35 flex items-center gap-0.5">
+                      <Eye className="h-2.5 w-2.5" />{fmtNum(stats.views)}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Scroll container */}

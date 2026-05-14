@@ -22,6 +22,7 @@ import Premium from "@/pages/premium";
 import Settings from "@/pages/settings";
 import Admin from "@/pages/admin";
 import MyProfile from "@/pages/my-profile";
+import Pitch from "@/pages/pitch";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -107,6 +108,7 @@ function App() {
               <Route path="/settings" component={Settings} />
               <Route path="/my-profile" component={MyProfile} />
               <Route path="/admin" component={Admin} />
+              <Route path="/pitch" component={Pitch} />
               <Route component={NotFound} />
             </Switch>
           </WouterRouter>

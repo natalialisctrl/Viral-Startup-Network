@@ -1,8 +1,186 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { motion, AnimatePresence, useInView, animate } from "framer-motion";
-import { Zap, Sparkles, TrendingUp, Heart, Shield, Star, ArrowRight, Quote, X, CheckCircle2, Loader2 } from "lucide-react";
+import { Zap, Sparkles, TrendingUp, Heart, Shield, Star, ArrowRight, Quote, X, CheckCircle2, Loader2, Play, MessageCircle, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+// ── Watch Demo Modal ────────────────────────────────────────────────────────────
+const DEMO_STEPS = [
+  {
+    icon: <Users className="h-6 w-6 text-cyan-400" />,
+    title: "Build your profile in 60 seconds",
+    desc: "Add your skills, equity range, and what excites you. Mesh builds your compatibility graph instantly.",
+    bg: "rgba(6,182,212,0.08)",
+    border: "rgba(6,182,212,0.2)",
+  },
+  {
+    icon: <Sparkles className="h-6 w-6 text-violet-400" />,
+    title: "AI matches you to the right people",
+    desc: "Mesh analyzes 40+ signals — skills, stage, culture, pace — and serves you the highest-compatibility profiles first.",
+    bg: "rgba(124,58,237,0.08)",
+    border: "rgba(124,58,237,0.2)",
+  },
+  {
+    icon: <Heart className="h-6 w-6 text-pink-400" />,
+    title: "Swipe. Match. See insights.",
+    desc: "When it's mutual, you get an AI breakdown of why you're a great fit — plus a ready-to-send conversation starter.",
+    bg: "rgba(236,72,153,0.08)",
+    border: "rgba(236,72,153,0.2)",
+  },
+  {
+    icon: <MessageCircle className="h-6 w-6 text-emerald-400" />,
+    title: "Chat and book directly",
+    desc: "No cold outreach. Chat in-app, share calendars, and move from match to meeting in under 10 minutes.",
+    bg: "rgba(52,211,153,0.08)",
+    border: "rgba(52,211,153,0.2)",
+  },
+];
+
+function WatchDemoModal({
+  onClose,
+  loginAs,
+  demoLoading,
+}: {
+  onClose: () => void;
+  loginAs: (type: "talent" | "founder") => void;
+  demoLoading: string | null;
+}) {
+  const [step, setStep] = useState(0);
+  const current = DEMO_STEPS[step];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[80] flex items-center justify-center p-4"
+      style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(16px)" }}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <motion.div
+        initial={{ scale: 0.92, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.92, opacity: 0 }}
+        transition={{ duration: 0.3, ease: "backOut" }}
+        className="relative w-full max-w-lg rounded-3xl overflow-hidden"
+        style={{
+          background: "rgba(10,10,10,0.96)",
+          border: "1px solid rgba(255,255,255,0.1)",
+          boxShadow: "0 0 60px rgba(6,182,212,0.15), 0 40px 80px rgba(0,0,0,0.7)",
+        }}
+      >
+        {/* Close */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full flex items-center justify-center transition-all hover:bg-white/10"
+          style={{ border: "1px solid rgba(255,255,255,0.12)" }}
+        >
+          <X className="h-4 w-4 text-white/60" />
+        </button>
+
+        {/* Header */}
+        <div className="px-7 pt-7 pb-5 border-b border-white/[0.07]">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase"
+              style={{ background: "rgba(6,182,212,0.12)", border: "1px solid rgba(6,182,212,0.25)", color: "#67e8f9" }}>
+              <Sparkles className="h-2.5 w-2.5" /> Mesh Demo
+            </span>
+          </div>
+          <h2 className="text-2xl font-black tracking-tight">How Mesh works</h2>
+          <p className="text-sm text-muted-foreground mt-0.5">4 steps from sign-up to first meeting</p>
+        </div>
+
+        {/* Step content */}
+        <div className="px-7 py-6">
+          {/* Progress dots */}
+          <div className="flex items-center gap-1.5 mb-6">
+            {DEMO_STEPS.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setStep(i)}
+                className="transition-all rounded-full"
+                style={{
+                  width: i === step ? "24px" : "6px",
+                  height: "6px",
+                  background: i === step ? "#06b6d4" : "rgba(255,255,255,0.15)",
+                }}
+              />
+            ))}
+          </div>
+
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={step}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.22 }}
+            >
+              <div
+                className="p-5 rounded-2xl mb-4 flex items-start gap-4"
+                style={{ background: current.bg, border: `1px solid ${current.border}` }}
+              >
+                <div className="p-2.5 rounded-xl shrink-0"
+                  style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                  {current.icon}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">Step {step + 1} of {DEMO_STEPS.length}</span>
+                  </div>
+                  <h3 className="font-bold text-base mb-1.5">{current.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{current.desc}</p>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Navigation */}
+          <div className="flex items-center justify-between gap-3 mt-2">
+            <button
+              onClick={() => setStep(Math.max(0, step - 1))}
+              disabled={step === 0}
+              className="px-4 py-2 rounded-xl text-sm font-medium disabled:opacity-30 transition-all hover:bg-white/8"
+              style={{ border: "1px solid rgba(255,255,255,0.1)" }}
+            >
+              Back
+            </button>
+            {step < DEMO_STEPS.length - 1 ? (
+              <button
+                onClick={() => setStep(step + 1)}
+                className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold transition-all"
+                style={{ background: "rgba(6,182,212,0.15)", border: "1px solid rgba(6,182,212,0.3)", color: "#67e8f9" }}
+              >
+                Next <ArrowRight className="h-3.5 w-3.5" />
+              </button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => { onClose(); loginAs("talent"); }}
+                  disabled={demoLoading !== null}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50"
+                  style={{ background: "rgba(6,182,212,0.15)", border: "1px solid rgba(6,182,212,0.3)", color: "#67e8f9" }}
+                >
+                  {demoLoading === "talent" ? <span className="h-3.5 w-3.5 rounded-full border-2 border-cyan-400/30 border-t-cyan-400 animate-spin" /> : "🧑‍💻"}
+                  Try as Engineer
+                </button>
+                <button
+                  onClick={() => { onClose(); loginAs("founder"); }}
+                  disabled={demoLoading !== null}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50"
+                  style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)", color: "rgba(255,255,255,0.8)" }}
+                >
+                  {demoLoading === "founder" ? <span className="h-3.5 w-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" /> : "🚀"}
+                  Try as Founder
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
 
 // ── Waitlist Modal ─────────────────────────────────────────────────────────────
 function WaitlistModal({ onClose }: { onClose: () => void }) {
@@ -293,14 +471,15 @@ const FLOAT_CARDS = [
 ];
 
 const DEMO_PERSONAS = [
-  { type: "talent" as const, emoji: "🧑‍💻", title: "Job Seeker", desc: "Browse & swipe on startups" },
-  { type: "founder" as const, emoji: "🚀",   title: "Founder",    desc: "Discover top-tier talent" },
+  { type: "talent" as const, emoji: "🧑‍💻", title: "Try as Engineer", desc: "Browse & swipe on startups" },
+  { type: "founder" as const, emoji: "🚀",   title: "Try as Founder",  desc: "Discover top-tier talent" },
 ];
 
 export default function Landing() {
   const { toast } = useToast();
   const [demoLoading, setDemoLoading] = useState<string | null>(null);
   const [showWaitlist, setShowWaitlist] = useState(false);
+  const [showWatchDemo, setShowWatchDemo] = useState(false);
 
   async function loginAs(type: "talent" | "founder") {
     setDemoLoading(type);
@@ -451,11 +630,15 @@ export default function Landing() {
               >
                 Find Your Match
               </button>
-              <Link href="/login">
-                <button className="rounded-full px-10 h-14 text-lg font-semibold border border-white/15 bg-white/5 hover:bg-white/10 backdrop-blur-sm w-full sm:w-auto transition-all text-foreground">
-                  Sign In
-                </button>
-              </Link>
+              <button
+                onClick={() => setShowWatchDemo(true)}
+                className="flex items-center gap-2.5 rounded-full px-8 h-14 text-lg font-semibold border border-white/15 bg-white/5 hover:bg-white/10 backdrop-blur-sm w-full sm:w-auto transition-all text-foreground"
+              >
+                <span className="flex items-center justify-center w-7 h-7 rounded-full bg-white/15 shrink-0">
+                  <Play className="h-3.5 w-3.5 fill-white ml-0.5" />
+                </span>
+                Watch a Demo
+              </button>
             </motion.div>
 
             {/* Demo Persona Picker */}
@@ -728,6 +911,9 @@ export default function Landing() {
 
       <AnimatePresence>
         {showWaitlist && <WaitlistModal onClose={() => setShowWaitlist(false)} />}
+      </AnimatePresence>
+      <AnimatePresence>
+        {showWatchDemo && <WatchDemoModal onClose={() => setShowWatchDemo(false)} loginAs={loginAs} demoLoading={demoLoading} />}
       </AnimatePresence>
 
       <footer className="border-t border-white/[0.07] py-10"
